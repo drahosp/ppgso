@@ -20,8 +20,6 @@ Recommended for OSX and Linux. For Windows see CMake setup.
   ./gl_gradient
 ```
 
-Running
-----
 Generating projects using CMake
 ----
 
@@ -49,9 +47,6 @@ After installation the files should be installed into a new `_install` subdirect
   cd PPGSO/_install
   ./gl_gradient
 ```
-
-Links
-----
 
 [1]: http://glew.sourceforge.net
 [2]: http://www.glfw.org
