@@ -19,15 +19,15 @@ include_directories(${OPENGL_INCLUDE_DIRS} ${GLFW3_INCLUDE_DIRS} ${GLEW_INCLUDE_
 set( LIBRARIES ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLEW_LIBRARIES})
 
 # gl_gradient
-add_executable( gl_gradient src/gl_gradient.cpp )
+add_executable( gl_gradient gl_gradient.cpp )
 target_link_libraries( gl_gradient ${LIBRARIES} )
 
 install ( TARGETS gl_gradient DESTINATION . )
-install ( FILES shaders/gl_gradient.vert shaders/gl_gradient.frag DESTINATION . )
+install ( FILES gl_gradient.vert gl_gradient.frag DESTINATION . )
 
 # gl_texture
-add_executable( gl_texture src/gl_texture.cpp )
+add_executable( gl_texture gl_texture.cpp )
 target_link_libraries( gl_texture ${LIBRARIES} )
 
 install ( TARGETS gl_texture DESTINATION . )
-install ( FILES images/lena.rgb shaders/gl_texture.vert shaders/gl_texture.frag DESTINATION . )
+install ( FILES lena.rgb gl_texture.vert gl_texture.frag DESTINATION . )
