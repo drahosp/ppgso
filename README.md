@@ -3,16 +3,30 @@ PPGSO OpenGL Examples
 
 This repository contains simple OpenGL 3.3 examples for educational purposes.
 
-All examples are written in C++11 and use [CMake build system](http://cmake.org). Additionally the following dependencies are required:
+All examples are written in C++11 and use Makefiles AND [CMake build system](http://cmake.org). Additionally the following dependencies are required:
 
 * [GLEW][1]
 * [GLFW3][2]
 * [GLM][3]
 
-Building
+On Linux install the following dependencies using your package manager, for example on Ubuntu do:
+
+```bash
+  sudo apt-get install libglew-dev libglfw3-dev libglm-dev
+```
+
+On OSX install Homebrew[4] package manager and install
+
+```bash
+  brew install glm glfw3 glew
+```
+
+Additionally you can also install CMake and use it to generate project files for your IDE of choice.
+
+Building using make
 ----
 
-Recommended for OSX and Linux. For Windows see CMake setup.
+Recommended for OSX and Linux is to simply use make. For Windows see next section.
 
 ```bash
   cd PPGSO/src
@@ -20,7 +34,18 @@ Recommended for OSX and Linux. For Windows see CMake setup.
   ./gl_gradient
 ```
 
-Generating projects using CMake
+Building and woking on Windows
+----
+
+Windows is a special case as always, however it is a lot easier if you avoid Visual Studio entirely. The recommended software is as follows:
+
+* Download and install TDM64[5], this is the latest GCC compiler for Windows in a nice installer.
+* Download CLion IDE[6], the trial is free for 30days and you can register for a FREE COPY using university mail.
+* Run CLion and open this directory as project, it should be ready to go.
+
+A good alternative IDE fow Windows is QTCreator[7] that should work out of the box with TDM64 and CMake. For other IDEs see below.
+
+Generic instructions using CMake, should work with Visual Studio
 ----
 
 Using CMake from commandline you can generate the project files as shown below. The placeholder [YOUR_GENERATOR] should be replaced with the generator appropriate for your IDE/environment. Usually removing the option entirely will generate the default for the given platform. To find out all available generators just run `cmake --help`
@@ -51,3 +76,7 @@ After installation the files should be installed into a new `_install` subdirect
 [1]: http://glew.sourceforge.net
 [2]: http://www.glfw.org
 [3]: http://glm.g-truc.net
+[4]: http://brew.sh
+[5]: http://tdm-gcc.tdragon.net
+[6]: https://www.jetbrains.com/clion/
+[7]: http://www.qt.io/ide/
