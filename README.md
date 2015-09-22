@@ -15,7 +15,7 @@ On Linux install the following dependencies using your package manager, for exam
   sudo apt-get install libglew-dev libglfw3-dev libglm-dev
 ```
 
-On OSX install Homebrew[4] package manager and install
+On OSX install [Homebrew][4] package manager and install
 
 ```bash
   brew install glm glfw3 glew
@@ -39,11 +39,11 @@ Building and woking on Windows
 
 Windows is a special case as always, however it is a lot easier if you avoid Visual Studio entirely. The recommended software is as follows:
 
-* Download and install TDM64[5], this is the latest GCC compiler for Windows in a nice installer.
-* Download CLion IDE[6], the trial is free for 30days and you can register for a FREE COPY using university mail.
+* Download and install [TDM64][5], this is the latest GCC compiler for Windows in a nice installer.
+* Download [CLion IDE][6], the trial is free for 30days and you can register for a FREE COPY using university mail.
 * Run CLion and open this directory as project, it should be ready to go.
 
-A good alternative IDE fow Windows is QTCreator[7] that should work out of the box with TDM64 and CMake. For other IDEs see below.
+A good alternative IDE fow Windows is [QTCreator][7] that should work out of the box with TDM64 and CMake. For other IDEs see below.
 
 Generic instructions using CMake, should work with Visual Studio
 ----
