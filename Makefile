@@ -7,10 +7,10 @@
 #
 
 CC		= g++
-CFLAGS	= -O3 -std="c++11" -Wall -Wno-deprecated
+CFLAGS	= -O2 -std=c++11 -Wextra -Wall
 UNAME := $(shell uname -s)
 
-ALL =   gl_gradient gl_texture
+ALL =   raw_gradient gl_gradient gl_texture
 
 all:  $(ALL)
 
