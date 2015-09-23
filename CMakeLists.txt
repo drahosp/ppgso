@@ -22,7 +22,7 @@ find_package ( GLM REQUIRED )     # GLM is header only
 find_package ( OpenGL REQUIRED )
 
 # Include header directories
-include_directories ( ${OPENGL_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} )
+include_directories ( ${OPENGL_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR} )
 
 # Prepare libraries for linking
 set ( LIBRARIES ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLEW_LIBRARIES} )
