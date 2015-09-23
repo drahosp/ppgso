@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstring>
 
 #pragma pack(push,1)
 struct TGA_Header {
@@ -202,9 +203,9 @@ public:
     data = new unsigned char[nbytes];
     
     if (image == NULL ) {
-      memset(data, 0, nbytes);
+      std::memset(data, 0, nbytes);
     } else {
-      memcpy(data, image, nbytes);
+      std::memcpy(data, image, nbytes);
 
       // swap RGB into BRG
       for (unsigned long i = 0; i < nbytes; i+=3)
