@@ -42,6 +42,7 @@ Windows is a special case as always, however it is a lot easier if you avoid Vis
 * Download and install [TDM64][5], this is the latest GCC compiler for Windows in a nice installer.
 * Download [CLion IDE][6], the trial is free for 30days and you can register for a FREE COPY using university mail.
 * Run CLion and open this directory as project, it should be ready to go.
+* For some examples you need to set working directory to the project folder.
 
 A good alternative IDE for Windows is [QTCreator][7] that should work out of the box with TDM64 and CMake. For other IDEs see below.
 
