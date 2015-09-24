@@ -52,7 +52,9 @@ install ( FILES lena.rgb gl_texture.vert gl_texture.frag DESTINATION . )
 #install ( TARGETS my_project DESTINATION . )
 #install ( FILES my_project.file my_project.vert my_project.frag DESTINATION . )
 
-# Install dlls to destinaiton when on Windows
+# Install dlls to destination when on Windows
 if ( MINGW )
   install ( FILES ${GLFW_LIBRARIES} ${GLEW_LIBRARIES} DESTINATION . )
+  # Install dlls into binary dir for development and debugging
+  file ( COPY ${GLFW_LIBRARIES} ${GLEW_LIBRARIES} DESTINATION ${CMAKE_BINARY_DIR} )
 endif ()
