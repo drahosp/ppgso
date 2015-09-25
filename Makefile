@@ -24,7 +24,7 @@ clean:
 
 # Linux
 ifeq ($(UNAME),Linux)
-LFLAGS = -lm -lGLEW -lglfw3 lGL -lGLU
+LFLAGS = -lm -lGLEW -lglfw -lGL -lGLU
 clean:
 	-rm $(ALL)
 endif
