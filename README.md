@@ -74,6 +74,12 @@ After installation the files should be installed into a new `_install` subdirect
   ./gl_gradient
 ```
 
+Possible problem when first time using GLM
+---
+
+Because of .gitignore configuration in glm directory are missing necessary files to compile your project.
+You should download it from [GLM][3] and after add it into your project source.
+
 [1]: http://glew.sourceforge.net
 [2]: http://www.glfw.org
 [3]: http://glm.g-truc.net
