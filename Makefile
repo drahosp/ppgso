@@ -1,37 +1,42 @@
 #
-# Makefile for OpenGL demo programs
+# Makefile for ppgso examples
 #
 # "make program" to make one program
 # "make" or "make all" to make all executables
 # "make clean" to remove executables
 #
 
-CC		= g++
-CFLAGS	= -O2 -std=c++11 -Wextra -Wall
+CC = g++
+CFLAGS = -O2 -std=c++11 -Wextra -Wall
+LFLAGS = -lm
 UNAME := $(shell uname -s)
 
-ALL =   raw_gradient gl_gradient gl_texture
+ALL = raw_gradient gl_gradient gl_texture
 
-all:  $(ALL)
+all: $(ALL)
 
-%: %.cpp
+gl_%: gl_%.cpp
+	$(CC) -o $@ $(CFLAGS) $< $(LFLAGS) $(GL_LFLAGS)
+
+raw_%: raw_%.cpp
 	$(CC) -o $@ $(CFLAGS) $< $(LFLAGS)
-
-# Windows
-LFLAGS	= -lm -lglew32 -lglfw3 -lOpenGL32 -lglu32
-clean:
-	-del *.exe
 
 # Linux
 ifeq ($(UNAME),Linux)
-LFLAGS = -lm -lGLEW -lglfw3 lGL -lGLU
+GL_LFLAGS = -lGLEW -lglfw -lGL -lGLU
 clean:
 	-rm $(ALL)
-endif
 
-# OSX
-ifeq ($(UNAME),Darwin)
-LFLAGS = -lm -lGLEW -lglfw3 -framework OpenGL
+# OSX 
+else ifeq ($(UNAME),Darwin)
+GL_LFLAGS = -lGLEW -lglfw3 -framework OpenGL
 clean:
 	-rm $(ALL)
+
+# Windows
+else
+GL_LFLAGS = -lglew32 -lglfw3 -lOpenGL32 -lglu32
+clean:
+	-del *.exe
+
 endif
