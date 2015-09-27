@@ -45,6 +45,12 @@ target_link_libraries( gl_texture ${LIBRARIES} )
 install ( TARGETS gl_texture DESTINATION . )
 install ( FILES lena.rgb gl_texture.vert gl_texture.frag DESTINATION . )
 
+# gl_animate
+add_executable ( gl_animate gl_animate.cpp  )
+target_link_libraries( gl_animate ${LIBRARIES} )
+
+install ( TARGETS gl_animate DESTINATION . )
+
 # ADD YOUR PROJECT HERE
 #add_executable( my_project my_project.cpp my_project_other.cpp )
 #target_link_libraries( my_project ${LIBRARIES} )
