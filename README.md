@@ -18,6 +18,7 @@ sudo apt-get install libglew-dev libglfw3-dev libglm-dev
 On OSX install [Homebrew][4] package manager and install
 
 ```bash
+brew tap homebrew/versions
 brew install glm glfw3 glew
 ```
 
