@@ -56,9 +56,16 @@ Common pitfalls
 
 ```
 # Edit idea.properties file in CLion install directory and add
-# Make sure the directory exists
 idea.system.path=C:/clion/system
+# Make sure the directory exists
 ```
+
+* Ubuntu 14.04 based distributions do not have GLFW3!
+  * Install [libglfw3 deb][http://launchpadlibrarian.net/173940430/libglfw3_3.0.4-1_amd64.deb]
+  * Then install [libglfw3-dev deb][http://launchpadlibrarian.net/173940431/libglfw3-dev_3.0.4-1_amd64.deb]
+
+* My linux does not have OpenGL. Missing -lGL
+  * Try to install `mesa-common-dev`, `libgl1-mesa-dev` and `libglu1-mesa-dev`
 
 Generic instructions using CMake, should work with Visual Studio
 ----
