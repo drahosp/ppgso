@@ -30,7 +30,7 @@ Building using make
 Recommended for OSX and Linux is to simply use make. For Windows see next section.
 
 ```bash
-cd ppgso/src
+cd ppgso-master
 make
 ./gl_gradient
 ```
@@ -61,8 +61,7 @@ idea.system.path=C:/clion/system
 ```
 
 * Ubuntu 14.04 based distributions do not have GLFW3!
-  * Install [libglfw3 deb][http://launchpadlibrarian.net/173940430/libglfw3_3.0.4-1_amd64.deb]
-  * Then install [libglfw3-dev deb][http://launchpadlibrarian.net/173940431/libglfw3-dev_3.0.4-1_amd64.deb]
+  * Install [libglfw3 deb][8] then install [libglfw3-dev][9] 
 
 * My linux does not have OpenGL. Missing -lGL
   * Try to install `mesa-common-dev`, `libgl1-mesa-dev` and `libglu1-mesa-dev`
@@ -102,3 +101,5 @@ cd ppgso/_install
 [5]: http://tdm-gcc.tdragon.net
 [6]: https://www.jetbrains.com/clion/
 [7]: http://www.qt.io/ide/
+[8]: http://launchpadlibrarian.net/173940430/libglfw3_3.0.4-1_amd64.deb
+[9]: http://launchpadlibrarian.net/173940431/libglfw3-dev_3.0.4-1_amd64.deb
