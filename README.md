@@ -52,7 +52,7 @@ A good alternative IDE for Windows is [QTCreator][7] that should work out of the
 Common pitfalls
 ---
 * NEVER store projects in paths and directories that contain spaces or non-ascii characters.
-* If you are unfortunate enough to have a username with non-acii characters builds will fail unless you edit CLion configuration manually.
+* If you are unfortunate enough to have a username with non-ascii characters builds will fail unless you edit CLion configuration manually.
 
 ```
 # Edit idea.properties file in CLion install directory and add
