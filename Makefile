@@ -11,7 +11,7 @@ CFLAGS = -O2 -std=c++11 -Wextra -Wall
 LFLAGS = -lm
 UNAME := $(shell uname -s)
 
-ALL = raw_gradient gl_gradient gl_texture gl_animate
+ALL = raw_gradient gl_gradient gl_texture gl_animate gl_projection
 
 all: $(ALL)
 
