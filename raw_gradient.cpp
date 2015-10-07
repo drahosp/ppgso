@@ -8,6 +8,9 @@
 // A header implementation of a TGAImage object
 #include "tga.h"
 
+// Simple bmp implementation used to store the result as a bitmap file
+#include "bmp.h"
+
 // Size of the framebuffer
 const unsigned int SIZE = 512;
 
@@ -44,6 +47,9 @@ int main() {
   // Helper object to save the framebuffer as TGA image
   TGAImage tga(SIZE, SIZE, 3, framebuffer);
   tga.write_tga_file("result.tga", true);
+  
+  //Save the raw image to a bitmap file
+  raw2bmp(framebuffer,"result.bmp",SIZE,SIZE);
 
   return EXIT_SUCCESS;
 }
