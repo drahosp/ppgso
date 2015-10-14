@@ -2,7 +2,6 @@
 // fed to OpenGL for display as texture.
 #include <iostream>
 #include <vector>
-#include <string>
 #include <fstream>
 #include <cmath>
 
@@ -136,13 +135,13 @@ void UpdateFramebuffer(float time) {
 
   for(unsigned int x=0; x<SIZE; x++) {
     for(unsigned int y=0; y<SIZE; y++) {
-      float fx = x/512.0f-.5;
-      float fy = y/512.0f-.5;
-      float dist = std::sqrt(std::pow(fx-cx, 2) + std::pow(fy-cy, 2));
+      float fx = x/512.0f-.5f;
+      float fy = y/512.0f-.5f;
+      float dist = std::sqrt(std::pow(fx-cx, 2.0f) + std::pow(fy-cy, 2.0f));
 
-      framebuffer[x][y].r = std::sin(dist*45.0f)*127+128;
-      framebuffer[x][y].g = std::sin(dist*44.0f)*127+128;
-      framebuffer[x][y].b = std::sin(dist*46.0f)*127+128;
+      framebuffer[x][y].r = (unsigned char)(std::sin(dist*45.0f)*127+128);
+      framebuffer[x][y].g = (unsigned char)(std::sin(dist*44.0f)*127+128);
+      framebuffer[x][y].b = (unsigned char)(std::sin(dist*46.0f)*127+128);
     }
   }
 }

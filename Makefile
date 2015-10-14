@@ -7,7 +7,7 @@
 #
 
 CC = g++
-CFLAGS = -O2 -std=c++11 -Wextra -Wall
+CFLAGS = -O2 -std=c++11 -Wpedantic -Wall -Wfloat-equal -Wextra -Wsign-promo -Wsign-compare -Wconversion -Wno-sign-conversion -I/usr/local/include -L/usr/local/lib
 LFLAGS = -lm
 UNAME := $(shell uname -s)
 
@@ -27,7 +27,7 @@ GL_LFLAGS = -lGLEW -lglfw -lGL -lGLU
 clean:
 	-rm $(ALL)
 
-# OSX 
+# OSX
 else ifeq ($(UNAME),Darwin)
 GL_LFLAGS = -lGLEW -lglfw3 -framework OpenGL
 clean:

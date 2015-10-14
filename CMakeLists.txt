@@ -15,6 +15,14 @@ set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake )
 set ( CMAKE_CXX_STANDARD 11 )
 set ( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
+# Warnings for Debug mode
+option( USE_STRICT_COMPILE_WARNINGS "Use strict compilation warnings in debug mode." ON )
+if( USE_STRICT_COMPILE_WARNINGS )
+    # Assuming Clang and GCC (NOTE: Sign conversion is ok in CPP)
+    set( STRICT_COMPILE_WARNINGS "-Wpedantic -Wall -Wfloat-equal -Wextra -Wsign-promo -Wsign-compare -Wconversion -Wno-sign-conversion" )
+    set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${STRICT_COMPILE_WARNINGS}" )
+endif()
+
 # Find dependencies
 find_package ( GLFW3 REQUIRED )
 find_package ( GLEW REQUIRED )

@@ -63,7 +63,7 @@ struct TGAColor {
     TGAColor res = *this;
     intensity = (intensity > 1.f ? 1.f : (intensity < 0.f ? 0.f : intensity));
 
-    for (int i = 0; i < 4; i++) res.bgra[i] = bgra[i] * intensity;
+    for (int i = 0; i < 4; i++) res.bgra[i] = (unsigned char)((float)bgra[i] * intensity);
     return res;
   }
 };
@@ -84,7 +84,7 @@ protected:
 
     do {
       unsigned char chunkheader = 0;
-      chunkheader = in.get();
+      chunkheader = (unsigned char)in.get();
 
       if (!in.good()) {
         std::cerr << "an error occured while reading the data\n";
@@ -319,9 +319,9 @@ public:
     }
     TGA_Header header;
     memset((void *)&header, 0, sizeof(header));
-    header.bitsperpixel = bytespp << 3;
-    header.width        = width;
-    header.height       = height;
+    header.bitsperpixel = (char)(bytespp << 3);
+    header.width        = (short)width;
+    header.height       = (short)height;
     header.datatypecode =
       (bytespp == GRAYSCALE ? (rle ? 11 : 3) : (rle ? 10 : 2));
     header.imagedescriptor = 0x20; // top-left origin
@@ -377,7 +377,7 @@ public:
     if (!data || (x < 0) || (y < 0) || (x >= width) || (y >= height)) {
       return TGAColor();
     }
-    return TGAColor(data + (x + y * width) * bytespp, bytespp);
+    return TGAColor(data + (x + y * width) * bytespp, (char)bytespp);
   }
 
   bool set(int x, int y, TGAColor& c) {
