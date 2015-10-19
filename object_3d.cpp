@@ -29,7 +29,7 @@ void Object3D::initGeometry(const std::string &obj_file) {
 
   // --- Vertex positions ---
   std::vector<GLfloat> vertex_buffer;
-  for (int i = 0; i < mesh.positions.size() / 3; i++) {
+  for (int i = 0; i < (int) mesh.positions.size() / 3; i++) {
     vertex_buffer.push_back(mesh.positions[3 * i + 0]); // X
     vertex_buffer.push_back(mesh.positions[3 * i + 1]); // Y
     vertex_buffer.push_back(mesh.positions[3 * i + 2]); // Z
@@ -47,7 +47,7 @@ void Object3D::initGeometry(const std::string &obj_file) {
 
   // --- Texture coordinates ---
   std::vector<GLfloat> texcoord_buffer;
-  for (int i = 0; i < mesh.texcoords.size() / 2; i++) {
+  for (int i = 0; i < (int) mesh.texcoords.size() / 2; i++) {
     texcoord_buffer.push_back(mesh.texcoords[2 * i + 0]); // U
     texcoord_buffer.push_back(mesh.texcoords[2 * i + 1]); // V
   }
@@ -68,8 +68,8 @@ void Object3D::initGeometry(const std::string &obj_file) {
 
   // --- Indices (define which triangles consists of which vertices) ---
   std::vector<GLuint> index_data;
-  this->mesh_indices_count = mesh.indices.size();
-  for (int i = 0; i < mesh.indices.size(); i++) {
+  this->mesh_indices_count = (int) mesh.indices.size();
+  for (int i = 0; i < (int) mesh.indices.size(); i++) {
     index_data.push_back(mesh.indices[i]);
   }
 

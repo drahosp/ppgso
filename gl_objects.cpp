@@ -95,10 +95,10 @@ void UpdateProjection(GLuint program_id, bool is_perspective, glm::mat4 camera) 
   // Create projection matrix
   glm::mat4 Projection;
   if (is_perspective) {
-  // Perspective projection matrix (field of view, aspect ratio, near plane distance, far plane distance)
+    // Perspective projection matrix (field of view, aspect ratio, near plane distance, far plane distance)
     Projection = glm::perspective(45.0f, 1.0f, 0.1f, 1000.0f);
   } else {
-  // Orthographic projection matrix (left, right, bottom, top, near plane distance, far plane distance)
+    // Orthographic projection matrix (left, right, bottom, top, near plane distance, far plane distance)
     Projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1000.0f, 1000.0f);
   }
 
@@ -124,14 +124,14 @@ void InitializeGLState() {
 }
 
 // Keyboard press event handler
-void OnKeyPress(GLFWwindow *window, int key, int scancode, int action, int mods) {
+void OnKeyPress(GLFWwindow* /* window */, int key, int /* scancode */, int action, int /* mods */) {
   if (key == GLFW_KEY_A && action == GLFW_PRESS) {
     animationEnabled = !animationEnabled;
   }
 }
 
 // Mouse move event handler
-void OnMouseMove(GLFWwindow* window, double xpos, double ypos) {
+void OnMouseMove(GLFWwindow* /* window */, double xpos, double ypos) {
   mousePosX = (xpos / ((double) SIZE) * 2) - 1;
   mousePosY = -((ypos / ((double) SIZE) * 2) - 1);
 }
