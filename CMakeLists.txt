@@ -59,12 +59,26 @@ target_link_libraries( gl_animate ${LIBRARIES} )
 
 install ( TARGETS gl_animate DESTINATION . )
 
+# gl_transform
+add_executable ( gl_transform gl_transform.cpp  )
+target_link_libraries( gl_transform ${LIBRARIES} )
+
+install ( TARGETS gl_transform DESTINATION . )
+install ( FILES gl_transform.vert gl_transform.frag DESTINATION . )
+
 # gl_projection
 add_executable ( gl_projection gl_projection.cpp  )
 target_link_libraries( gl_projection ${LIBRARIES} )
 
 install ( TARGETS gl_projection DESTINATION . )
 install ( FILES gl_projection.vert gl_projection.frag DESTINATION . )
+
+# gl_objects
+add_executable ( gl_objects gl_objects.cpp object_3d.cpp tiny_obj_loader.cpp )
+target_link_libraries( gl_objects ${LIBRARIES} )
+
+install ( TARGETS gl_objects DESTINATION . )
+install ( FILES gl_objects.vert gl_objects.frag sphere.obj sphere.rgb cursor.obj DESTINATION . )
 
 # ADD YOUR PROJECT HERE
 #add_executable( my_project my_project.cpp my_project_other.cpp )
