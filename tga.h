@@ -207,7 +207,7 @@ public:
     } else {
       std::memcpy(data, image, nbytes);
 
-      // swap RGB into BRG
+      // swap RGB into BGR
       for (unsigned long i = 0; i < nbytes; i+=bpp)
         std::swap(data[i], data[i+2]); 
     }
