@@ -1,8 +1,9 @@
-// Example of:
-// - More than one object (loaded from OBJ file)
-// - Keyboard events (press A to start/stop animation)
-// - Mouse events
-// - Orthographic camera projection
+// Example gl_mesh
+// - Displays geometry that is loaded from OBJ files encapsuladed in a mesh object
+// - Demonstrtes basic use of keyboard events (press A to start/stop animation)
+// - Implements object transformation based on mouse movement
+// - Combines parallel and orthographic camera projection
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -15,79 +16,16 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "object_3d.h"
+#include "mesh.h"
+#include "shaderprogram.h"
+#include "gl_mesh_frag.h"
+#include "gl_mesh_vert.h"
 
 const unsigned int SIZE = 512;
 
 bool animationEnabled = true;
 double mousePosX = 0.0;
 double mousePosY = 0.0;
-
-GLuint ShaderProgram(const std::string &vertex_shader_file, const std::string &fragment_shader_file) {
-  // Create shaders
-  auto vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
-  auto fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
-  auto result = GL_FALSE;
-  auto info_length = 0;
-
-  // Load shader code
-  std::ifstream vertex_shader_stream(vertex_shader_file);
-  std::string vertex_shader_code((std::istreambuf_iterator<char>(vertex_shader_stream)), std::istreambuf_iterator<char>());
-
-  std::ifstream fragment_shader_stream(fragment_shader_file);
-  std::string fragment_shader_code((std::istreambuf_iterator<char>(fragment_shader_stream)), std::istreambuf_iterator<char>());
-
-  // Compile vertex shader
-  std::cout << "Compiling Vertex Shader ..." << std::endl;
-  auto vertex_shader_code_ptr = vertex_shader_code.c_str();
-  glShaderSource(vertex_shader_id, 1, &vertex_shader_code_ptr, NULL);
-  glCompileShader(vertex_shader_id);
-
-  // Check vertex shader log
-  glGetShaderiv(vertex_shader_id, GL_COMPILE_STATUS, &result);
-  if (result == GL_FALSE) {
-    glGetShaderiv(vertex_shader_id, GL_INFO_LOG_LENGTH, &info_length);
-    std::string vertex_shader_log((unsigned int)info_length, ' ');
-    glGetShaderInfoLog(vertex_shader_id, info_length, NULL, &vertex_shader_log[0]);
-    std::cout << vertex_shader_log << std::endl;
-  }
-
-  // Compile fragment shader
-  std::cout << "Compiling Fragment Shader ..." << std::endl;
-  auto fragment_shader_code_ptr = fragment_shader_code.c_str();
-  glShaderSource(fragment_shader_id, 1, &fragment_shader_code_ptr, NULL);
-  glCompileShader(fragment_shader_id);
-
-  // Check fragment shader log
-  glGetShaderiv(fragment_shader_id, GL_COMPILE_STATUS, &result);
-  if (result == GL_FALSE) {
-    glGetShaderiv(fragment_shader_id, GL_INFO_LOG_LENGTH, &info_length);
-    std::string fragment_shader_log((unsigned long)info_length, ' ');
-    glGetShaderInfoLog(fragment_shader_id, info_length, NULL, &fragment_shader_log[0]);
-    std::cout << fragment_shader_log << std::endl;
-  }
-
-  // Create and link the program
-  std::cout << "Linking Shader Program ..." << std::endl;
-  auto program_id = glCreateProgram();
-  glAttachShader(program_id, vertex_shader_id);
-  glAttachShader(program_id, fragment_shader_id);
-  glBindFragDataLocation(program_id, 0, "FragmentColor");
-  glLinkProgram(program_id);
-
-  // Check program log
-  glGetProgramiv(program_id, GL_LINK_STATUS, &result);
-  if (result == GL_FALSE) {
-    glGetProgramiv(program_id, GL_INFO_LOG_LENGTH, &info_length);
-    std::string program_log((unsigned long)info_length, ' ');
-    glGetProgramInfoLog(program_id, info_length, NULL, &program_log[0]);
-    std::cout << program_log << std::endl;
-  }
-  glDeleteShader(vertex_shader_id);
-  glDeleteShader(fragment_shader_id);
-
-  return program_id;
-}
 
 void UpdateProjection(GLuint program_id, bool is_perspective, glm::mat4 camera) {
   glUseProgram(program_id);
@@ -96,7 +34,7 @@ void UpdateProjection(GLuint program_id, bool is_perspective, glm::mat4 camera) 
   glm::mat4 Projection;
   if (is_perspective) {
     // Perspective projection matrix (field of view, aspect ratio, near plane distance, far plane distance)
-    Projection = glm::perspective(45.0f, 1.0f, 0.1f, 1000.0f);
+    Projection = glm::perspective(45.0f, 1.0f, 0.1f, 10.0f);
   } else {
     // Orthographic projection matrix (left, right, bottom, top, near plane distance, far plane distance)
     Projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1000.0f, 1000.0f);
@@ -176,19 +114,19 @@ int main() {
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN); // Hide mouse cursor
 
   // Load shaders
-  GLint program_id = ShaderProgram("gl_objects.vert", "gl_objects.frag");
+  GLint program_id = ShaderProgram(gl_mesh_vert, gl_mesh_frag);
 
   // Initialize OpenGL state
   InitializeGLState();
 
   // Create objects from OBJ files with the specified textures
-  Object3D object0 = Object3D(
+  auto object0 = Mesh(
     program_id, // Render object with this program (ID)
     "sphere.obj", // OBJ file
     "sphere.rgb", 256, 256 // Texture file (and its width, height)
   );
-  Object3D object1 = Object3D(program_id, "sphere.obj", "sphere.rgb", 256, 256);
-  Object3D cursor = Object3D(program_id, "cursor.obj", "lena.rgb", 512, 512);
+  auto object1 = Mesh(program_id, "sphere.obj", "sphere.rgb", 256, 256);
+  auto cursor = Mesh(program_id, "cursor.obj", "lena.rgb", 512, 512);
 
   float time = 0;
   float prevTime = 0;

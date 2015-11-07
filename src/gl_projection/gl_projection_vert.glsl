@@ -13,7 +13,7 @@ uniform mat4 ModelMatrix;
 
 void main() {
   // Copy the input to the fragment shader
-  fragTexCoord = vec2(TexCoord);
+  FragTexCoord = TexCoord;
 
   // Calculate the final position on screen
   gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(Position, 1.0);

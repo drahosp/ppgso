@@ -5,9 +5,11 @@
 //
 
 //
-// version 0.9.14: Support specular highlight, bump, displacement and alpha map(#53)
+// version 0.9.14: Support specular highlight, bump, displacement and alpha
+// map(#53)
 // version 0.9.13: Report "Material file not found message" in `err`(#46)
-// version 0.9.12: Fix groups being ignored if they have 'usemtl' just before 'g' (#44)
+// version 0.9.12: Fix groups being ignored if they have 'usemtl' just before
+// 'g' (#44)
 // version 0.9.11: Invert `Tr` parameter(#43)
 // version 0.9.10: Fix seg fault on windows.
 // version 0.9.9 : Replace atof() with custom parser.
@@ -17,7 +19,8 @@
 // version 0.9.6 : Support Ni(index of refraction) mtl parameter.
 //                 Parse transmittance material parameter correctly.
 // version 0.9.5 : Parse multiple group name.
-//                 Add support of specifying the base path to load material file.
+//                 Add support of specifying the base path to load material
+//                 file.
 // version 0.9.4 : Initial suupport of group tag(g)
 // version 0.9.3 : Fix parsing triple 'x/y/z'
 // version 0.9.2 : Add more .mtl load support
@@ -42,7 +45,7 @@
 
 namespace tinyobj {
 
-#define TINYOBJ_SSCANF_BUFFER_SIZE  (4096)
+#define TINYOBJ_SSCANF_BUFFER_SIZE (4096)
 
 struct vertex_index {
   int v_idx, vt_idx, vn_idx;
@@ -77,8 +80,10 @@ static inline bool isNewLine(const char c) {
 
 // Make index zero-base, and also support relative index.
 static inline int fixIndex(int idx, int n) {
-  if (idx > 0) return idx - 1;
-  if (idx == 0) return 0;
+  if (idx > 0)
+    return idx - 1;
+  if (idx == 0)
+    return 0;
   return n + idx; // negative value = relative
 }
 
@@ -98,7 +103,6 @@ static inline int parseInt(const char *&token) {
   return i;
 }
 
-
 // Tries to parse a floating point number located at s.
 //
 // s_end should be a location in the string where reading should absolutely
@@ -115,7 +119,7 @@ static inline int parseInt(const char *&token) {
 //  Valid strings are for example:
 //   -0	 +3.1417e+2  -0.0E-3  1.0324  -1.41   11e2
 //
-// If the parsing is a success, result is set to the parsed value and true 
+// If the parsing is a success, result is set to the parsed value and true
 // is returned.
 //
 // The function is greedy and will parse until any of the following happens:
@@ -125,121 +129,110 @@ static inline int parseInt(const char *&token) {
 // The following situations triggers a failure:
 //  - s >= s_end.
 //  - parse failure.
-// 
-static bool tryParseDouble(const char *s, const char *s_end, double *result)
-{
-	if (s >= s_end)
-	{
-		return false;
-	}
+//
+static bool tryParseDouble(const char *s, const char *s_end, double *result) {
+  if (s >= s_end) {
+    return false;
+  }
 
-	double mantissa = 0.0;
-	// This exponent is base 2 rather than 10.
-	// However the exponent we parse is supposed to be one of ten,
-	// thus we must take care to convert the exponent/and or the 
-	// mantissa to a * 2^E, where a is the mantissa and E is the
-	// exponent.
-	// To get the final double we will use ldexp, it requires the
-	// exponent to be in base 2.
-	int exponent = 0;
+  double mantissa = 0.0;
+  // This exponent is base 2 rather than 10.
+  // However the exponent we parse is supposed to be one of ten,
+  // thus we must take care to convert the exponent/and or the
+  // mantissa to a * 2^E, where a is the mantissa and E is the
+  // exponent.
+  // To get the final double we will use ldexp, it requires the
+  // exponent to be in base 2.
+  int exponent = 0;
 
-	// NOTE: THESE MUST BE DECLARED HERE SINCE WE ARE NOT ALLOWED
-	// TO JUMP OVER DEFINITIONS.
-	char sign = '+';
-	char exp_sign = '+';
-	char const *curr = s;
+  // NOTE: THESE MUST BE DECLARED HERE SINCE WE ARE NOT ALLOWED
+  // TO JUMP OVER DEFINITIONS.
+  char sign = '+';
+  char exp_sign = '+';
+  char const *curr = s;
 
-	// How many characters were read in a loop. 
-	int read = 0;
-	// Tells whether a loop terminated due to reaching s_end.
-	bool end_not_reached = false;
+  // How many characters were read in a loop.
+  int read = 0;
+  // Tells whether a loop terminated due to reaching s_end.
+  bool end_not_reached = false;
 
-	/*
-		BEGIN PARSING.
-	*/
+  /*
+          BEGIN PARSING.
+  */
 
-	// Find out what sign we've got.
-	if (*curr == '+' || *curr == '-')
-	{
-		sign = *curr;
-		curr++;
-	}
-	else if (isdigit(*curr)) { /* Pass through. */ }
-	else
-	{
-		goto fail;
-	}
+  // Find out what sign we've got.
+  if (*curr == '+' || *curr == '-') {
+    sign = *curr;
+    curr++;
+  } else if (isdigit(*curr)) { /* Pass through. */
+  } else {
+    goto fail;
+  }
 
-	// Read the integer part.
-	while ((end_not_reached = (curr != s_end)) && isdigit(*curr))
-	{
-		mantissa *= 10;
-		mantissa += static_cast<int>(*curr - 0x30);
-		curr++;	read++;
-	}
+  // Read the integer part.
+  while ((end_not_reached = (curr != s_end)) && isdigit(*curr)) {
+    mantissa *= 10;
+    mantissa += static_cast<int>(*curr - 0x30);
+    curr++;
+    read++;
+  }
 
-	// We must make sure we actually got something.
-	if (read == 0)
-		goto fail;
-	// We allow numbers of form "#", "###" etc.
-	if (!end_not_reached)
-		goto assemble;
+  // We must make sure we actually got something.
+  if (read == 0)
+    goto fail;
+  // We allow numbers of form "#", "###" etc.
+  if (!end_not_reached)
+    goto assemble;
 
-	// Read the decimal part.
-	if (*curr == '.')
-	{
-		curr++;
-		read = 1;
-		while ((end_not_reached = (curr != s_end)) && isdigit(*curr))
-		{
-			// NOTE: Don't use powf here, it will absolutely murder precision.
-			mantissa += static_cast<int>(*curr - 0x30) * pow(10.0, -read);
-			read++; curr++;
-		}
-	}
-	else if (*curr == 'e' || *curr == 'E') {}
-	else
-	{
-		goto assemble;
-	}
+  // Read the decimal part.
+  if (*curr == '.') {
+    curr++;
+    read = 1;
+    while ((end_not_reached = (curr != s_end)) && isdigit(*curr)) {
+      // NOTE: Don't use powf here, it will absolutely murder precision.
+      mantissa += static_cast<int>(*curr - 0x30) * pow(10.0, -read);
+      read++;
+      curr++;
+    }
+  } else if (*curr == 'e' || *curr == 'E') {
+  } else {
+    goto assemble;
+  }
 
-	if (!end_not_reached)
-		goto assemble;
+  if (!end_not_reached)
+    goto assemble;
 
-	// Read the exponent part.
-	if (*curr == 'e' || *curr == 'E')
-	{
-		curr++;
-		// Figure out if a sign is present and if it is.
-		if ((end_not_reached = (curr != s_end)) && (*curr == '+' || *curr == '-'))
-		{
-			exp_sign = *curr;
-			curr++;
-		}
-		else if (isdigit(*curr)) { /* Pass through. */ }
-		else
-		{
-			// Empty E is not allowed.
-			goto fail;
-		}
+  // Read the exponent part.
+  if (*curr == 'e' || *curr == 'E') {
+    curr++;
+    // Figure out if a sign is present and if it is.
+    if ((end_not_reached = (curr != s_end)) && (*curr == '+' || *curr == '-')) {
+      exp_sign = *curr;
+      curr++;
+    } else if (isdigit(*curr)) { /* Pass through. */
+    } else {
+      // Empty E is not allowed.
+      goto fail;
+    }
 
-		read = 0;
-		while ((end_not_reached = (curr != s_end)) && isdigit(*curr))
-		{
-			exponent *= 10;
-			exponent += static_cast<int>(*curr - 0x30);
-			curr++;	read++;
-		}
-		exponent *= (exp_sign == '+'? 1 : -1);
-		if (read == 0)
-			goto fail;
-	}
+    read = 0;
+    while ((end_not_reached = (curr != s_end)) && isdigit(*curr)) {
+      exponent *= 10;
+      exponent += static_cast<int>(*curr - 0x30);
+      curr++;
+      read++;
+    }
+    exponent *= (exp_sign == '+' ? 1 : -1);
+    if (read == 0)
+      goto fail;
+  }
 
 assemble:
-	*result = (sign == '+'? 1 : -1) * ldexp(mantissa * pow(5.0, exponent), exponent);
-	return true;
+  *result =
+      (sign == '+' ? 1 : -1) * ldexp(mantissa * pow(5.0, exponent), exponent);
+  return true;
 fail:
-	return false;
+  return false;
 }
 static inline float parseFloat(const char *&token) {
   token += strspn(token, " \t");
@@ -255,7 +248,6 @@ static inline float parseFloat(const char *&token) {
 #endif
   return f;
 }
-
 
 static inline void parseFloat2(float &x, float &y, const char *&token) {
   x = parseFloat(token);
@@ -368,7 +360,7 @@ static bool exportFaceGroupToShape(
     const std::vector<float> &in_positions,
     const std::vector<float> &in_normals,
     const std::vector<float> &in_texcoords,
-    const std::vector<std::vector<vertex_index> > &faceGroup,
+    const std::vector<std::vector<vertex_index>> &faceGroup,
     const int material_id, const std::string &name, bool clearCache) {
   if (faceGroup.empty()) {
     return false;
@@ -461,8 +453,8 @@ std::string LoadMtl(std::map<std::string, int> &material_map,
     if ((0 == strncmp(token, "newmtl", 6)) && isSpace((token[6]))) {
       // flush previous material.
       if (!material.name.empty()) {
-        material_map.insert(
-            std::pair<std::string, int>(material.name, static_cast<int>(materials.size())));
+        material_map.insert(std::pair<std::string, int>(
+            material.name, static_cast<int>(materials.size())));
         materials.push_back(material);
       }
 
@@ -640,8 +632,8 @@ std::string LoadMtl(std::map<std::string, int> &material_map,
     }
   }
   // flush last material.
-  material_map.insert(
-      std::pair<std::string, int>(material.name, static_cast<int>(materials.size())));
+  material_map.insert(std::pair<std::string, int>(
+      material.name, static_cast<int>(materials.size())));
   materials.push_back(material);
 
   return err.str();
@@ -662,8 +654,9 @@ std::string MaterialFileReader::operator()(const std::string &matId,
   std::string err = LoadMtl(matMap, materials, matIStream);
   if (!matIStream) {
     std::stringstream ss;
-    //ss << "WARN: Material file [ " << filepath << " ] not found. Created a default material.";
-    //err += ss.str();
+    // ss << "WARN: Material file [ " << filepath << " ] not found. Created a
+    // default material.";
+    // err += ss.str();
   }
   return err;
 }
@@ -699,7 +692,7 @@ std::string LoadObj(std::vector<shape_t> &shapes,
   std::vector<float> v;
   std::vector<float> vn;
   std::vector<float> vt;
-  std::vector<std::vector<vertex_index> > faceGroup;
+  std::vector<std::vector<vertex_index>> faceGroup;
   std::string name;
 
   // material
@@ -781,8 +774,9 @@ std::string LoadObj(std::vector<shape_t> &shapes,
 
       std::vector<vertex_index> face;
       while (!isNewLine(token[0])) {
-        vertex_index vi =
-            parseTriple(token, static_cast<int>(v.size() / 3), static_cast<int>(vn.size() / 3), static_cast<int>(vt.size() / 2));
+        vertex_index vi = parseTriple(token, static_cast<int>(v.size() / 3),
+                                      static_cast<int>(vn.size() / 3),
+                                      static_cast<int>(vt.size() / 2));
         face.push_back(vi);
         size_t n = strspn(token, " \t\r");
         token += n;
@@ -808,7 +802,7 @@ std::string LoadObj(std::vector<shape_t> &shapes,
       bool ret = exportFaceGroupToShape(shape, vertexCache, v, vn, vt,
                                         faceGroup, material, name, true);
       if (ret) {
-          shapes.push_back(shape);
+        shapes.push_back(shape);
       }
       shape = shape_t();
       faceGroup.clear();

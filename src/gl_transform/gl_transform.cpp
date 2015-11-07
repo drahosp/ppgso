@@ -1,6 +1,8 @@
-// This example demonstrates how to use texture as input for a shader
-// Notice that we now have two vertex buffer objects to feed the shader
-// The texture itself is loaded raw RGB from a file directly into OpenGL
+// Example gl_transform
+// - This example demonstrates basic 2D transformations
+// - Notice that the glm library uses column major order when declaring matrices
+// - Try to combilne multiple transformation using multiplication
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -9,73 +11,14 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/mat3x3.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "shaderprogram.h"
+#include "gl_transform_vert.h"
+#include "gl_transform_frag.h"
+
 const unsigned int SIZE = 512;
-
-GLuint ShaderProgram(const std::string &vertex_shader_file, const std::string &fragment_shader_file) {
-  // Create shaders
-  auto vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
-  auto fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
-  auto result = GL_FALSE;
-  auto info_length = 0;
-
-  // Load shader code
-  std::ifstream vertex_shader_stream(vertex_shader_file);
-  std::string vertex_shader_code((std::istreambuf_iterator<char>(vertex_shader_stream)), std::istreambuf_iterator<char>());
-
-  std::ifstream fragment_shader_stream(fragment_shader_file);
-  std::string fragment_shader_code((std::istreambuf_iterator<char>(fragment_shader_stream)), std::istreambuf_iterator<char>());
-
-  // Compile vertex shader
-  std::cout << "Compiling Vertex Shader ..." << std::endl;
-  auto vertex_shader_code_ptr = vertex_shader_code.c_str();
-  glShaderSource(vertex_shader_id, 1, &vertex_shader_code_ptr, NULL);
-  glCompileShader(vertex_shader_id);
-
-  // Check vertex shader log
-  glGetShaderiv(vertex_shader_id, GL_COMPILE_STATUS, &result);
-  if (result == GL_FALSE) {
-    glGetShaderiv(vertex_shader_id, GL_INFO_LOG_LENGTH, &info_length);
-    std::string vertex_shader_log((unsigned int)info_length, ' ');
-    glGetShaderInfoLog(vertex_shader_id, info_length, NULL, &vertex_shader_log[0]);
-    std::cout << vertex_shader_log << std::endl;
-  }
-
-  // Compile fragment shader
-  std::cout << "Compiling Fragment Shader ..." << std::endl;
-  auto fragment_shader_code_ptr = fragment_shader_code.c_str();
-  glShaderSource(fragment_shader_id, 1, &fragment_shader_code_ptr, NULL);
-  glCompileShader(fragment_shader_id);
-
-  // Check fragment shader log
-  glGetShaderiv(fragment_shader_id, GL_COMPILE_STATUS, &result);
-  if (result == GL_FALSE) {
-    glGetShaderiv(fragment_shader_id, GL_INFO_LOG_LENGTH, &info_length);
-    std::string fragment_shader_log((unsigned long)info_length, ' ');
-    glGetShaderInfoLog(fragment_shader_id, info_length, NULL, &fragment_shader_log[0]);
-    std::cout << fragment_shader_log << std::endl;
-  }
-
-  // Create and link the program
-  std::cout << "Linking Shader Program ..." << std::endl;
-  auto program_id = glCreateProgram();
-  glAttachShader(program_id, vertex_shader_id);
-  glAttachShader(program_id, fragment_shader_id);
-  glBindFragDataLocation(program_id, 0, "FragmentColor");
-  glLinkProgram(program_id);
-
-  // Check program log
-  glGetProgramiv(program_id, GL_LINK_STATUS, &result);
-  if (result == GL_FALSE) {
-    glGetProgramiv(program_id, GL_INFO_LOG_LENGTH, &info_length);
-    std::string program_log((unsigned long)info_length, ' ');
-    glGetProgramInfoLog(program_id, info_length, NULL, &program_log[0]);
-    std::cout << program_log << std::endl;
-  }
-  glDeleteShader(vertex_shader_id);
-  glDeleteShader(fragment_shader_id);
-
-  return program_id;
-}
 
 void InitializeGeometry(GLuint program_id) {
   // Generate a vertex array object
@@ -148,6 +91,68 @@ GLuint LoadImage(const std::string &image_file, unsigned int width, unsigned int
   return texture_id;
 }
 
+void SetTransformation(GLuint program_id, float time) {
+  // Create transformation matrix
+  // NOTE: glm matrices are declared column major !
+
+  // identity
+  auto transform = glm::mat3({
+     1.0, 0.0, 0.0,
+     0.0, 1.0, 0.0,
+     0.0, 0.0, 1.0
+  });
+
+  // scale
+  // transform *= glm::mat3({
+  //    std::sin(time), 0.0, 0.0,
+  //    0.0, std::sin(time), 0.0,
+  //    0.0, 0.0, 1.0
+  //  });
+
+  // squash
+  // transform *= glm::mat3({
+  //   std::sin(time), 0.0, 0.0,
+  //   0.0, std::cos(time), 0.0,
+  //   0.0, 0.0, 1.0
+  // });
+
+  // rotate
+  transform *= glm::mat3({
+     std::cos(time), std::sin(time), 0.0,
+     -std::sin(time), std::cos(time), 0.0,
+     0.0, 0.0, 1.0
+  });
+
+  // translate
+  // transform *= glm::mat3({
+  //    1.0, 0.0, 0.0,
+  //   0.0, 1.0, 0.0,
+  //   std::sin(time)/2.0, std::cos(time)/2.0, 1.0
+  // });
+
+  // Rotate around top right corner
+  // transform *= glm::mat3({
+  //   // Move to origin
+  //   1.0, 0.0, 0.0,
+  //   0.0, 1.0, 0.0,
+  //   1.0, 1.0, 1.0
+  // }) * glm::mat3({
+  //   // Rotate
+  //   std::cos(time), std::sin(time), 0.0,
+  //   -std::sin(time), std::cos(time), 0.0,
+  //   0.0, 0.0, 1.0
+  // }) * glm::mat3({
+  //   // Move back
+  //   1.0, 0.0, 0.0,
+  //   0.0, 1.0, 0.0,
+  //   -1.0, -1.0, 1.0
+  // });
+
+  // Send matrix value to program
+  auto transform_uniform = glGetUniformLocation(program_id, "Transform");
+  glUniformMatrix3fv(transform_uniform, 1, GL_FALSE, glm::value_ptr(transform));
+}
+
 int main() {
   // Initialize GLFW
   if (!glfwInit()) {
@@ -183,7 +188,7 @@ int main() {
   }
 
   // Load shaders
-  auto program_id = ShaderProgram("gl_texture.vert", "gl_texture.frag");
+  auto program_id = ShaderProgram(gl_transform_vert, gl_transform_frag);
   glUseProgram(program_id);
 
   InitializeGeometry(program_id);
@@ -195,12 +200,15 @@ int main() {
   glActiveTexture(GL_TEXTURE0 + 0);
   glBindTexture(GL_TEXTURE_2D, texture_id);
 
+  float time = 0;
   // Main execution loop
   while (!glfwWindowShouldClose(window)) {
     // Set gray background
     glClearColor(.5f,.5f,.5f,0);
     // Clear depth and color buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    SetTransformation(program_id, time+=0.01);
 
     // Draw triangles using the program
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

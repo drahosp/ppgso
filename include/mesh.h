@@ -1,5 +1,5 @@
-#ifndef _OBJECT_3D_H_
-#define _OBJECT_3D_H_
+#ifndef _PPGSO_MESH_H
+#define _PPGSO_MESH_H
 
 #include <iostream>
 #include <vector>
@@ -12,7 +12,7 @@
 
 #include "tiny_obj_loader.h"
 
-class Object3D {
+class Mesh {
   GLuint vao;
   GLuint vbo, tbo;
   GLuint ibo;
@@ -22,9 +22,11 @@ class Object3D {
 
   void initGeometry(const std::string &);
   void initTexture(const std::string &, unsigned int, unsigned int);
+
 public:
-  Object3D(GLuint, const std::string &, const std::string &, unsigned int, unsigned int);
+  Mesh(GLuint, const std::string &, const std::string &, unsigned int,
+       unsigned int);
   void render(glm::mat4);
 };
 
-#endif
+#endif // _PPGSO_MESH_H
