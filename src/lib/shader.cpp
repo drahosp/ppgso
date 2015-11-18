@@ -14,7 +14,6 @@ Shader::Shader(const std::string &vertex_shader_code, const std::string &fragmen
   auto info_length = 0;
 
   // Compile vertex shader
-  std::cout << "Compiling Vertex Shader ..." << std::endl;
   auto vertex_shader_code_ptr = vertex_shader_code.c_str();
   glShaderSource(vertex_shader_id, 1, &vertex_shader_code_ptr, NULL);
   glCompileShader(vertex_shader_id);
@@ -26,11 +25,11 @@ Shader::Shader(const std::string &vertex_shader_code, const std::string &fragmen
     std::string vertex_shader_log((unsigned int) info_length, ' ');
     glGetShaderInfoLog(vertex_shader_id, info_length, NULL,
                        &vertex_shader_log[0]);
+    std::cout << "Error Compiling Vertex Shader ..." << std::endl;
     std::cout << vertex_shader_log << std::endl;
   }
 
   // Compile fragment shader
-  std::cout << "Compiling Fragment Shader ..." << std::endl;
   auto fragment_shader_code_ptr = fragment_shader_code.c_str();
   glShaderSource(fragment_shader_id, 1, &fragment_shader_code_ptr, NULL);
   glCompileShader(fragment_shader_id);
@@ -42,11 +41,11 @@ Shader::Shader(const std::string &vertex_shader_code, const std::string &fragmen
     std::string fragment_shader_log((unsigned long) info_length, ' ');
     glGetShaderInfoLog(fragment_shader_id, info_length, NULL,
                        &fragment_shader_log[0]);
+    std::cout << "Error Compiling Fragment Shader ..." << std::endl;
     std::cout << fragment_shader_log << std::endl;
   }
 
   // Create and link the program
-  std::cout << "Linking Shader Program ..." << std::endl;
   auto program_id = glCreateProgram();
   glAttachShader(program_id, vertex_shader_id);
   glAttachShader(program_id, fragment_shader_id);
@@ -59,6 +58,7 @@ Shader::Shader(const std::string &vertex_shader_code, const std::string &fragmen
     glGetProgramiv(program_id, GL_INFO_LOG_LENGTH, &info_length);
     std::string program_log((unsigned long) info_length, ' ');
     glGetProgramInfoLog(program_id, info_length, NULL, &program_log[0]);
+    std::cout << "Error Linking Shader Program ..." << std::endl;
     std::cout << program_log << std::endl;
   }
   glDeleteShader(vertex_shader_id);

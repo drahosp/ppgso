@@ -7,6 +7,8 @@
 
 #include <GLFW/glfw3.h>
 
+#define PI 3.14159265358979323846f
+
 bool Player::Update(Scene &scene, float dt) {
   // Hit detection
   for ( auto obj : scene.objects ) {
@@ -27,10 +29,10 @@ bool Player::Update(Scene &scene, float dt) {
   // Keyboard controls
   if(scene.keyboard[GLFW_KEY_LEFT]) {
     position.x += 10 * dt;
-    rotation.y = (float)M_PI_4;
+    rotation.y = PI/4.0f;
   } else if(scene.keyboard[GLFW_KEY_RIGHT]) {
     position.x -= 10 * dt;
-    rotation.y = -(float)M_PI_4;
+    rotation.y = -PI/4.0f;
   } else {
     rotation.y = 0;
   }
@@ -55,7 +57,7 @@ void Player::Render(Scene &scene) {
 Player::Player() {
   // Scale the default model
   scale *= 3.0f;
-  rotation.x = (float)M_PI/2.0f;
+  rotation.x = PI/2.0f;
 
   // Initialize static resources if needed
   if (!shader) shader = ShaderPtr(new Shader{object_vert, object_frag});

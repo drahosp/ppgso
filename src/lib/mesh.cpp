@@ -86,12 +86,12 @@ void Mesh::initGeometry(const std::string &obj_file) {
                index_data.data(), GL_STATIC_DRAW);
 
   // Complete the vertex array object
-  glBindVertexArray(NULL);
+//  glBindVertexArray(0);
 }
 
 void Mesh::Render() {
   // Draw object
   glBindVertexArray(this->vao);
   glDrawElements(GL_TRIANGLES, this->mesh_indices_count, GL_UNSIGNED_INT, 0);
-  glBindVertexArray(NULL);
+//  glBindVertexArray(0);
 }

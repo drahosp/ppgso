@@ -77,7 +77,7 @@ bool TGAImage::load_rle_data(std::ifstream &in) {
         }
       }
     } else {
-      chunkheader -= 127;
+      chunkheader = (unsigned char)(chunkheader-127);
       in.read((char *) colorbuffer.bgra, bytespp);
 
       if (!in.good()) {
@@ -136,7 +136,7 @@ bool TGAImage::unload_rle_data(std::ofstream &out) {
       run_length++;
     }
     curpix += run_length;
-    out.put(raw ? run_length - 1 : run_length + 127);
+    out.put((char)(raw ? run_length - 1 : run_length + 127));
 
     if (!out.good()) {
       std::cerr << "can't dump the tga file\n";

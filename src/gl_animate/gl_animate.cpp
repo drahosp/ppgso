@@ -26,8 +26,8 @@ void UpdateTexture(TexturePtr texture, float time) {
   for(unsigned int x = 0; x < texture->width; x++) {
     for(unsigned int y = 0; y < texture->height; y++) {
       auto pixel = texture->GetPixel(x, y);
-      float fx = x / (float)texture->width - .5f;
-      float fy = y / (float)texture->height - .5f;
+      float fx = (float)x / (float)(texture->width) - .5f;
+      float fy = (float)y / (float)(texture->height) - .5f;
       float dist = std::sqrt(std::pow(fx - cx, 2.0f) + std::pow(fy - cy, 2.0f));
 
       pixel->r = (unsigned char) (std::sin(dist * 45.0f) * 127 + 128);

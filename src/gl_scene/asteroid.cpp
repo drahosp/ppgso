@@ -3,9 +3,9 @@
 #include "object_frag.h"
 #include "object_vert.h"
 
-Asteroid::Asteroid() {
-  float PI = (float)M_PI;
+#define PI 3.14159265358979323846f
 
+Asteroid::Asteroid() {
   scale *= Rand(1.0f, 3.0f);
   speed = glm::vec3(Rand(-2.0f, 2.0f), Rand(-5.0f, -10.0f), 0.0f);
   rotation = glm::vec3(Rand(-PI, PI), Rand(-PI, PI), Rand(-PI, PI));

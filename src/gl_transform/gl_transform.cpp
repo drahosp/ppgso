@@ -132,7 +132,7 @@ int main() {
     // Clear depth and color buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    SetTransformation(program, time+=0.01);
+    SetTransformation(program, time+=0.01f);
 
     program->SetMatrix(glm::mat4(1.0f), "ModelView");
     quad.Render();
