@@ -82,6 +82,10 @@ cd ppgso/_install
 ./gl_gradient
 ```
 
+Credits
+----
+Rudolf Getel for free ship model.
+
 Relevant Documentation
 ----
 - GLM [official documentation][10] and [samples][11]
