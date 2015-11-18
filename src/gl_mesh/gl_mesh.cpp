@@ -16,6 +16,8 @@
 #include "gl_mesh_frag.h"
 #include "gl_mesh_vert.h"
 
+#define PI 3.14159265358979323846f
+
 const unsigned int SIZE = 512;
 
 bool animationEnabled = true;
@@ -119,7 +121,7 @@ int main() {
     program->SetMatrix(cameraMat, "ViewMatrix");
 
     // Update camera position with perspective projection
-    program->SetMatrix(glm::perspective(45.0f, 1.0f, 0.1f, 10.0f), "ProjectionMatrix");
+    program->SetMatrix(glm::perspective((PI/180.f) * 60.0f, 1.0f, 0.1f, 10.0f), "ProjectionMatrix");
 
     // Render objects
     program->SetTexture(sphereTexture, "Texture");

@@ -23,6 +23,7 @@ if (USE_STRICT_COMPILE_WARNINGS)
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${STRICT_COMPILE_WARNINGS}")
 endif ()
 
+# Make sure GLM uses radians
 add_definitions ( -DGLM_FORCE_RADIANS )
 
 # Add custom target for installation in CLion

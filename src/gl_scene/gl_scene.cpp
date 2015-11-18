@@ -28,7 +28,7 @@ void InitializeScene() {
   scene.objects.clear();
 
   // Create a camera
-  auto camera = CameraPtr(new Camera{ 45.0f, 1.0f, 0.1f, 100.0f});
+  auto camera = CameraPtr(new Camera{ 60.0f, 1.0f, 0.1f, 100.0f});
   camera->position.z = -15.0f;
   scene.camera = camera;
 

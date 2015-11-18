@@ -2,8 +2,12 @@
 
 #include "camera.h"
 
+#define PI 3.14159265358979323846f
+
 Camera::Camera(float fow, float ratio, float near, float far) {
-  projectionMatrix = glm::perspective(fow, ratio, near, far);
+  float fowInRad = (PI/180.0f) * fow;
+
+  projectionMatrix = glm::perspective(fowInRad, ratio, near, far);
 
   up = glm::vec3(0,1,0);
   position = glm::vec3(0,0,0);

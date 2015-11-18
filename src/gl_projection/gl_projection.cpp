@@ -19,6 +19,8 @@
 
 const unsigned int SIZE = 512;
 
+#define PI 3.14159265358979323846f
+
 int main() {
   // Initialize GLFW
   if (!glfwInit()) {
@@ -73,8 +75,8 @@ int main() {
   program->SetTexture(texture, "Texture");
 
   // Initialize projection
-  // Create projection matrix (field of view, aspect ratio, near plane distance, far plane distance)
-  auto projection = glm::perspective(45.0f, 1.0f, 0.1f, 10.0f);
+  // Create projection matrix (field of view (radians), aspect ratio, near plane distance, far plane distance)
+  auto projection = glm::perspective( (PI/180.f) * 60.0f, 1.0f, 0.1f, 10.0f);
   program->SetMatrix(projection, "ProjectionMatrix");
 
   // Create view matrix (translate camera a bit backwards, so we can see the geometry)
