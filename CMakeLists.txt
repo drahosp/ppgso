@@ -2,7 +2,7 @@
 # It should find bundled binary dependencies automatically when using MinGW compiler
 # On Linux and Mac the dependencies (glm, glew, glfw) need to be installed manually
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.0)
 project(ppgso CXX)
 
 #
@@ -12,7 +12,7 @@ project(ppgso CXX)
 # Basic CMake settings
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/_install)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "-std=c++11")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Warnings for Debug mode
@@ -22,6 +22,8 @@ if (USE_STRICT_COMPILE_WARNINGS)
   set(STRICT_COMPILE_WARNINGS "-Wpedantic -Wall -Wfloat-equal -Wextra -Wsign-promo -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-unused-parameter")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${STRICT_COMPILE_WARNINGS}")
 endif ()
+
+add_definitions ( -DGLM_FORCE_RADIANS )
 
 # Add custom target for installation in CLion
 add_custom_target(run_install COMMAND ${CMAKE_MAKE_PROGRAM} install)
