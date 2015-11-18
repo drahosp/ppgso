@@ -23,6 +23,9 @@ public:
   GLuint GetProgram();
 
   void SetFloat(float value, const std::string &name);
+  void SetVector(glm::vec2 vector, const std::string &name);
+  void SetVector(glm::vec3 vector, const std::string &name);
+  void SetVector(glm::vec4 vector, const std::string &name);
   void SetTexture(const TexturePtr texture, const std::string &name);
   void SetMatrix(glm::mat4 matrix, const std::string &name);
   void SetMatrix(glm::mat3 matrix, const std::string &name);

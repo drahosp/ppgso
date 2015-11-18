@@ -106,3 +106,18 @@ void Shader::SetFloat(float value, const std::string &name) {
 }
 
 GLuint Shader::GetProgram() { return program; };
+
+void Shader::SetVector(glm::vec2 vector, const std::string &name) {
+  auto uniform = GetUniformLocation(name.c_str());
+  glUniform2fv(uniform, 1, glm::value_ptr(vector));
+}
+
+void Shader::SetVector(glm::vec3 vector, const std::string &name) {
+  auto uniform = GetUniformLocation(name.c_str());
+  glUniform2fv(uniform, 1, glm::value_ptr(vector));
+}
+
+void Shader::SetVector(glm::vec4 vector, const std::string &name) {
+  auto uniform = GetUniformLocation(name.c_str());
+  glUniform2fv(uniform, 1, glm::value_ptr(vector));
+}
