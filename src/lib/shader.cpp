@@ -1,13 +1,11 @@
-#ifndef _PPGSO_SHADERPROGRAM_H
-#define _PPGSO_SHADERPROGRAM_H
+#include <iostream>
 
-#include <string>
+#include <glm/gtc/type_ptr.hpp>
 
-#include <GL/glew.h>
+#include "texture.h"
+#include "shader.h"
 
-// Create a shader program from vertex and fragment shader sources
-GLuint ShaderProgram(const std::string &vertex_shader_code,
-                     const std::string &fragment_shader_code) {
+Shader::Shader(const std::string &vertex_shader_code, const std::string &fragment_shader_code) {
   // Create shaders
   auto vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
   auto fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
@@ -24,7 +22,7 @@ GLuint ShaderProgram(const std::string &vertex_shader_code,
   glGetShaderiv(vertex_shader_id, GL_COMPILE_STATUS, &result);
   if (result == GL_FALSE) {
     glGetShaderiv(vertex_shader_id, GL_INFO_LOG_LENGTH, &info_length);
-    std::string vertex_shader_log((unsigned int)info_length, ' ');
+    std::string vertex_shader_log((unsigned int) info_length, ' ');
     glGetShaderInfoLog(vertex_shader_id, info_length, NULL,
                        &vertex_shader_log[0]);
     std::cout << vertex_shader_log << std::endl;
@@ -40,7 +38,7 @@ GLuint ShaderProgram(const std::string &vertex_shader_code,
   glGetShaderiv(fragment_shader_id, GL_COMPILE_STATUS, &result);
   if (result == GL_FALSE) {
     glGetShaderiv(fragment_shader_id, GL_INFO_LOG_LENGTH, &info_length);
-    std::string fragment_shader_log((unsigned long)info_length, ' ');
+    std::string fragment_shader_log((unsigned long) info_length, ' ');
     glGetShaderInfoLog(fragment_shader_id, info_length, NULL,
                        &fragment_shader_log[0]);
     std::cout << fragment_shader_log << std::endl;
@@ -58,14 +56,53 @@ GLuint ShaderProgram(const std::string &vertex_shader_code,
   glGetProgramiv(program_id, GL_LINK_STATUS, &result);
   if (result == GL_FALSE) {
     glGetProgramiv(program_id, GL_INFO_LOG_LENGTH, &info_length);
-    std::string program_log((unsigned long)info_length, ' ');
+    std::string program_log((unsigned long) info_length, ' ');
     glGetProgramInfoLog(program_id, info_length, NULL, &program_log[0]);
     std::cout << program_log << std::endl;
   }
   glDeleteShader(vertex_shader_id);
   glDeleteShader(fragment_shader_id);
 
-  return program_id;
+  program = program_id;
 }
 
-#endif //  _PPGSO_SHADERPROGRAM_H
+Shader::~Shader() {
+  glDeleteProgram( program );
+};
+
+void Shader::Use() {
+  glUseProgram(program);
+}
+
+GLuint Shader::GetAttribLocation(const std::string &name) {
+  return glGetAttribLocation(program, name.c_str());
+}
+
+GLuint Shader::GetUniformLocation(const std::string &name) {
+  return glGetUniformLocation(program, name.c_str());
+}
+
+void Shader::SetTexture(const TexturePtr texture, const std::string &name) {
+  auto texture_id = texture->GetTexture();
+  auto uniform = GetUniformLocation(name.c_str());
+  glUniform1i(uniform, 0);
+  glActiveTexture(GL_TEXTURE0 + 0);
+  glBindTexture(GL_TEXTURE_2D, texture_id);
+}
+
+void Shader::SetMatrix(glm::mat4 matrix, const std::string &name) {
+  auto uniform = GetUniformLocation(name.c_str());
+  glUniformMatrix4fv(uniform, 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
+void Shader::SetMatrix(glm::mat3 matrix, const std::string &name) {
+  auto uniform = GetUniformLocation(name.c_str());
+  glUniformMatrix3fv(uniform, 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
+void Shader::SetFloat(float value, const std::string &name) {
+  auto uniform = GetUniformLocation(name.c_str());
+  glUniform1f(uniform, value);
+}
+
+GLuint Shader::GetProgram() { return program; };

@@ -1,12 +1,13 @@
 #include "mesh.h"
 
-Mesh::Mesh(GLuint program_id, const std::string &obj_file,
-           const std::string &image_file, unsigned int width,
-           unsigned int height) {
-  this->program_id = program_id;
-
+Mesh::Mesh(ShaderPtr program, const std::string &obj_file) {
+  this->program = program;
   this->initGeometry(obj_file);
-  this->initTexture(image_file, width, height);
+}
+
+Mesh::Mesh(ShaderPtr program, const std::string &obj_file, const TexturePtr texture) {
+  Mesh(program, obj_file);
+  this->texture = texture;
 }
 
 void Mesh::initGeometry(const std::string &obj_file) {
@@ -23,7 +24,7 @@ void Mesh::initGeometry(const std::string &obj_file) {
   tinyobj::mesh_t mesh = shapes[0].mesh;
 
   // Activate the program
-  glUseProgram(this->program_id);
+  program->Use();
 
   // Generate a vertex array object
   glGenVertexArrays(1, &this->vao);
@@ -44,7 +45,7 @@ void Mesh::initGeometry(const std::string &obj_file) {
                vertex_buffer.data(), GL_STATIC_DRAW);
 
   // Bind the buffer to "Position" attribute in program
-  GLint position_attrib = glGetAttribLocation(this->program_id, "Position");
+  auto position_attrib = program->GetAttribLocation("Position");
   glEnableVertexAttribArray(position_attrib);
   glVertexAttribPointer(position_attrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
@@ -63,7 +64,7 @@ void Mesh::initGeometry(const std::string &obj_file) {
 
   // Bind the buffer to "TexCoord" attribute in program
   if (mesh.texcoords.size() > 0) {
-    GLint texcoord_attrib = glGetAttribLocation(this->program_id, "TexCoord");
+    auto texcoord_attrib = program->GetAttribLocation("TexCoord");
     glEnableVertexAttribArray(texcoord_attrib);
     glVertexAttribPointer(texcoord_attrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
   } else {
@@ -88,45 +89,7 @@ void Mesh::initGeometry(const std::string &obj_file) {
   glBindVertexArray(NULL);
 }
 
-// Load a new image from a raw RGB file directly into OpenGL memory
-void Mesh::initTexture(const std::string &image_file, unsigned int width,
-                       unsigned int height) {
-  // Create new texture object
-  glGenTextures(1, &this->texture_id);
-  glBindTexture(GL_TEXTURE_2D, this->texture_id);
-
-  // Set mipmaps
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-  // Read raw data
-  std::ifstream image_stream(image_file, std::ios::binary);
-
-  // Setup buffer for pixels (r,g,b bytes), since we will not manipulate the
-  // image just keep it as char
-  std::vector<char> buffer(width * height * 3);
-  image_stream.read(buffer.data(), buffer.size());
-  image_stream.close();
-
-  // Upload texture to GPU
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-               GL_UNSIGNED_BYTE, buffer.data());
-}
-
-void Mesh::render(glm::mat4 modelMatrix) {
-  // Activate the program
-  glUseProgram(this->program_id);
-
-  // Bind the texture to "Texture" uniform in program
-  GLint texture_attrib = glGetUniformLocation(this->program_id, "Texture");
-  glUniform1i(texture_attrib, 0);
-  glActiveTexture(GL_TEXTURE0 + 0);
-  glBindTexture(GL_TEXTURE_2D, this->texture_id);
-
-  // Upload model matrix to GPU
-  GLint model_uniform = glGetUniformLocation(this->program_id, "ModelMatrix");
-  glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-
+void Mesh::Render() {
   // Draw object
   glBindVertexArray(this->vao);
   glDrawElements(GL_TRIANGLES, this->mesh_indices_count, GL_UNSIGNED_INT, 0);

@@ -4,14 +4,11 @@
 
 #include <iostream>
 #include <vector>
-#include <string>
-#include <fstream>
 
-// OpenGL related libraries
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "shaderprogram.h"
+#include "shader.h"
 #include "gl_gradient_vert.h"
 #include "gl_gradient_frag.h"
 
@@ -32,7 +29,7 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   // Try to create a window
-  auto window = glfwCreateWindow( SIZE, SIZE, "OpenGL", NULL, NULL);
+  auto window = glfwCreateWindow( SIZE, SIZE, "PPGSO gl_gradient", NULL, NULL);
   if (window == NULL) {
     std::cerr << "Failed to open GLFW window, your graphics card is probably only capable of OpenGL 2.1" << std::endl;
     glfwTerminate();
@@ -52,7 +49,8 @@ int main() {
   }
 
   // Load shaders
-  auto program_id = ShaderProgram(gl_gradient_vert, gl_gradient_frag);
+  auto program = ShaderPtr(new Shader{gl_gradient_vert, gl_gradient_frag});
+  program->Use();
 
   // Generate a vertex array object
   // This keeps track of what attributes are associated with buffers
@@ -62,11 +60,11 @@ int main() {
 
   // Setup geometry
   std::vector<GLfloat> vertex_buffer{
-    // x, y
-    1.0f, 1.0f,
-      -1.0f, 1.0f,
-      1.0f, -1.0f,
-      -1.0f, -1.0f
+          // x, y
+          1.0f, 1.0f,
+          -1.0f, 1.0f,
+          1.0f, -1.0f,
+          -1.0f, -1.0f
   };
 
   // Generate a vertex buffer object, this will feed data to the vertex shader
@@ -76,12 +74,13 @@ int main() {
   glBufferData(GL_ARRAY_BUFFER, vertex_buffer.size() * sizeof(GLfloat), vertex_buffer.data(), GL_STATIC_DRAW);
 
   // Setup vertex array lookup, this tells the shader how to pick data for the "Position" input
-  auto position_attrib = glGetAttribLocation(program_id, "Position");
+  auto position_attrib = program->GetAttribLocation("Position");
   glVertexAttribPointer(position_attrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray(position_attrib);
 
   // Colors for vertices
   std::vector<GLfloat> color_buffer{
+          // r, g, b
           1.0f, 0.0f, 0.0f,
           0.0f, 1.0f, 0.0f,
           0.0, 0.0f, 1.0f,
@@ -94,7 +93,7 @@ int main() {
   glBufferData(GL_ARRAY_BUFFER, color_buffer.size() * sizeof(GLfloat), color_buffer.data(), GL_STATIC_DRAW);
 
   // Same thing for colors
-  auto color_attrib = glGetAttribLocation(program_id, "Color");
+  auto color_attrib = program->GetAttribLocation("Color");
   glVertexAttribPointer(color_attrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray(color_attrib);
 
@@ -106,7 +105,6 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Draw triangles using the program
-    glUseProgram(program_id);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     // Display result
@@ -115,7 +113,6 @@ int main() {
   }
 
   // Clean up
-  glDeleteProgram(program_id);
   glDeleteBuffers(1, &vbo);
   glDeleteVertexArrays(1, &vao);
   glfwTerminate();

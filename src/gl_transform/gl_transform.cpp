@@ -14,84 +14,14 @@
 #include <glm/mat3x3.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "shaderprogram.h"
+#include "shader.h"
+#include "mesh.h"
 #include "gl_transform_vert.h"
 #include "gl_transform_frag.h"
 
 const unsigned int SIZE = 512;
 
-void InitializeGeometry(GLuint program_id) {
-  // Generate a vertex array object
-  GLuint vao;
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-
-  // Setup geometry
-  std::vector<GLfloat> vertex_buffer {
-    // x, y
-    1.0f, 1.0f,
-      -1.0f, 1.0f,
-      1.0f, -1.0f,
-      -1.0f, -1.0f
-  };
-
-  // Generate a vertex buffer object
-  GLuint vbo;
-  glGenBuffers(1, &vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, vertex_buffer.size() * sizeof(GLfloat), vertex_buffer.data(), GL_STATIC_DRAW);
-
-  // Setup vertex array lookup
-  auto position_attrib = glGetAttribLocation(program_id, "Position");
-  glVertexAttribPointer(position_attrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
-  glEnableVertexAttribArray(position_attrib);
-
-  // Generate another vertex buffer object for texture coordinates
-  std::vector<GLfloat> texcoord_buffer {
-    // u, v
-    1.0f, 0.0f,
-      0.0f, 0.0f,
-      1.0f, 1.0f,
-      0.0f, 1.0f
-  };
-
-  GLuint tbo;
-  glGenBuffers(1, &tbo);
-  glBindBuffer(GL_ARRAY_BUFFER, tbo);
-  glBufferData(GL_ARRAY_BUFFER, texcoord_buffer.size() * sizeof(GLfloat), texcoord_buffer.data(), GL_STATIC_DRAW);
-
-  auto texcoord_attrib = glGetAttribLocation(program_id, "TexCoord");
-  glVertexAttribPointer(texcoord_attrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
-  glEnableVertexAttribArray(texcoord_attrib);
-}
-
-// Load a new image from a raw RGB file directly into OpenGL memory
-GLuint LoadImage(const std::string &image_file, unsigned int width, unsigned int height) {
-  // Create new texture object
-  GLuint texture_id;
-  glGenTextures(1, &texture_id);
-  glBindTexture(GL_TEXTURE_2D, texture_id);
-
-  // Set mipmaps
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-  // Read raw data
-  std::ifstream image_stream(image_file, std::ios::binary);
-
-  // Setup buffer for pixels (r,g,b bytes), since we will not manipulate the image just keep it as char
-  std::vector<char> buffer(width*height*3);
-  image_stream.read(buffer.data(), buffer.size());
-  image_stream.close();
-
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
-
-  return texture_id;
-}
-
-void SetTransformation(GLuint program_id, float time) {
+void SetTransformation(ShaderPtr program, float time) {
   // Create transformation matrix
   // NOTE: glm matrices are declared column major !
 
@@ -149,7 +79,7 @@ void SetTransformation(GLuint program_id, float time) {
   // });
 
   // Send matrix value to program
-  auto transform_uniform = glGetUniformLocation(program_id, "Transform");
+  auto transform_uniform = program->GetUniformLocation("Transform");
   glUniformMatrix3fv(transform_uniform, 1, GL_FALSE, glm::value_ptr(transform));
 }
 
@@ -168,7 +98,7 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   // Try to create a window
-  auto window = glfwCreateWindow( SIZE, SIZE, "OpenGL", NULL, NULL);
+  auto window = glfwCreateWindow( SIZE, SIZE, "PPGSO gl_transform", NULL, NULL);
   if (window == NULL) {
     std::cerr << "Failed to open GLFW window, your graphics card is probably only capable of OpenGL 2.1" << std::endl;
     glfwTerminate();
@@ -188,17 +118,11 @@ int main() {
   }
 
   // Load shaders
-  auto program_id = ShaderProgram(gl_transform_vert, gl_transform_frag);
-  glUseProgram(program_id);
+  auto program = ShaderPtr(new Shader{gl_transform_vert, gl_transform_frag});
+  program->Use();
 
-  InitializeGeometry(program_id);
-
-  // Load and bind texture
-  auto texture_id = LoadImage("lena.rgb", SIZE, SIZE);
-  auto texture_attrib = glGetUniformLocation(program_id, "Texture");
-  glUniform1i(texture_attrib, 0);
-  glActiveTexture(GL_TEXTURE0 + 0);
-  glBindTexture(GL_TEXTURE_2D, texture_id);
+  auto texture = Texture{"lena.rgb", 512, 512};
+  auto quad = Mesh{program, "quad.obj"};
 
   float time = 0;
   // Main execution loop
@@ -208,10 +132,10 @@ int main() {
     // Clear depth and color buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    SetTransformation(program_id, time+=0.01);
+    SetTransformation(program, time+=0.01);
 
-    // Draw triangles using the program
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    program->SetMatrix(glm::mat4(1.0f), "ModelView");
+    quad.Render();
 
     // Display result
     glfwSwapBuffers(window);

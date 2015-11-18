@@ -7,8 +7,6 @@ in vec2 TexCoord;
 out vec2 FragTexCoord;
 
 // Matrices as program attributes
-uniform mat4 ProjectionMatrix;
-uniform mat4 ViewMatrix;
 uniform mat4 ModelMatrix;
 
 void main() {
@@ -16,5 +14,5 @@ void main() {
   FragTexCoord = TexCoord;
 
   // Calculate the final position on screen
-  gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(Position, 1.0);
+  gl_Position = ModelMatrix * vec4(Position, 1.0);
 }

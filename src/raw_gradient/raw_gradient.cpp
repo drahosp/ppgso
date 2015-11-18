@@ -44,7 +44,7 @@ int main() {
   raw.close();
 
   // Helper object to save the framebuffer as TGA image
-  std::cout << "Generating recult.tga file ..." << std::endl;
+  std::cout << "Generating result.tga file ..." << std::endl;
   TGAImage tga(SIZE, SIZE, 3, framebuffer);
   tga.write_tga_file("result.tga", true);
 

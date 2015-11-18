@@ -5,62 +5,17 @@
 
 #include <iostream>
 #include <vector>
-#include <string>
 #include <fstream>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "shaderprogram.h"
+#include "shader.h"
+#include "mesh.h"
 #include "gl_texture_vert.h"
 #include "gl_texture_frag.h"
 
 const unsigned int SIZE = 512;
-
-void InitializeGeometry(GLuint program_id) {
-  // Generate a vertex array object
-  GLuint vao;
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-
-  // Setup geometry
-  std::vector<GLfloat> vertex_buffer {
-    // x, y
-    1.0f, 1.0f,
-      -1.0f, 1.0f,
-      1.0f, -1.0f,
-      -1.0f, -1.0f
-  };
-
-  // Generate a vertex buffer object
-  GLuint vbo;
-  glGenBuffers(1, &vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, vertex_buffer.size() * sizeof(GLfloat), vertex_buffer.data(), GL_STATIC_DRAW);
-
-  // Setup vertex array lookup
-  auto position_attrib = glGetAttribLocation(program_id, "Position");
-  glVertexAttribPointer(position_attrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
-  glEnableVertexAttribArray(position_attrib);
-
-  // Generate another vertex buffer object for texture coordinates
-  std::vector<GLfloat> texcoord_buffer {
-    // u, v
-    1.0f, 0.0f,
-      0.0f, 0.0f,
-      1.0f, 1.0f,
-      0.0f, 1.0f
-  };
-
-  GLuint tbo;
-  glGenBuffers(1, &tbo);
-  glBindBuffer(GL_ARRAY_BUFFER, tbo);
-  glBufferData(GL_ARRAY_BUFFER, texcoord_buffer.size() * sizeof(GLfloat), texcoord_buffer.data(), GL_STATIC_DRAW);
-
-  auto texcoord_attrib = glGetAttribLocation(program_id, "TexCoord");
-  glVertexAttribPointer(texcoord_attrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
-  glEnableVertexAttribArray(texcoord_attrib);
-}
 
 // Load a new image from a raw RGB file directly into OpenGL memory
 GLuint LoadImage(const std::string &image_file, unsigned int width, unsigned int height) {
@@ -103,7 +58,7 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   // Try to create a window
-  auto window = glfwCreateWindow( SIZE, SIZE, "OpenGL", NULL, NULL);
+  auto window = glfwCreateWindow( SIZE, SIZE, "PPGSO gl_texture", NULL, NULL);
   if (window == NULL) {
     std::cerr << "Failed to open GLFW window, your graphics card is probably only capable of OpenGL 2.1" << std::endl;
     glfwTerminate();
@@ -123,14 +78,14 @@ int main() {
   }
 
   // Load shaders
-  auto program_id = ShaderProgram(gl_texture_vert, gl_texture_frag);
-  glUseProgram(program_id);
+  auto program = ShaderPtr(new Shader{gl_texture_vert, gl_texture_frag});
+  program->Use();
 
-  InitializeGeometry(program_id);
+  auto quad = Mesh{program, "quad.obj"};
 
   // Load and bind texture
   auto texture_id = LoadImage("lena.rgb", SIZE, SIZE);
-  auto texture_attrib = glGetUniformLocation(program_id, "Texture");
+  auto texture_attrib = program->GetUniformLocation("Texture");
   glUniform1i(texture_attrib, 0);
   glActiveTexture(GL_TEXTURE0 + 0);
   glBindTexture(GL_TEXTURE_2D, texture_id);
@@ -142,8 +97,7 @@ int main() {
     // Clear depth and color buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Draw triangles using the program
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    quad.Render();
 
     // Display result
     glfwSwapBuffers(window);

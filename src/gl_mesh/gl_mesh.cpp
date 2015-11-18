@@ -1,14 +1,8 @@
 // Example gl_mesh
 // - Displays geometry that is loaded from OBJ files encapsuladed in a mesh object
-// - Demonstrtes basic use of keyboard events (press A to start/stop animation)
+// - Demonstrates basic use of keyboard events (press A to start/stop animation)
 // - Implements object transformation based on mouse movement
 // - Combines parallel and orthographic camera projection
-
-#include <iostream>
-#include <vector>
-#include <string>
-#include <fstream>
-#include <cmath>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -17,7 +11,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "mesh.h"
-#include "shaderprogram.h"
+#include "shader.h"
+
 #include "gl_mesh_frag.h"
 #include "gl_mesh_vert.h"
 
@@ -26,40 +21,6 @@ const unsigned int SIZE = 512;
 bool animationEnabled = true;
 double mousePosX = 0.0;
 double mousePosY = 0.0;
-
-void UpdateProjection(GLuint program_id, bool is_perspective, glm::mat4 camera) {
-  glUseProgram(program_id);
-
-  // Create projection matrix
-  glm::mat4 Projection;
-  if (is_perspective) {
-    // Perspective projection matrix (field of view, aspect ratio, near plane distance, far plane distance)
-    Projection = glm::perspective(45.0f, 1.0f, 0.1f, 10.0f);
-  } else {
-    // Orthographic projection matrix (left, right, bottom, top, near plane distance, far plane distance)
-    Projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1000.0f, 1000.0f);
-  }
-
-  // Send projection matrix value to program
-  auto projection_uniform = glGetUniformLocation(program_id, "ProjectionMatrix");
-  glUniformMatrix4fv(projection_uniform, 1, GL_FALSE, glm::value_ptr(Projection));
-
-  // Send view matrix value to program
-  auto view_uniform = glGetUniformLocation(program_id, "ViewMatrix");
-  glm::mat4 View = glm::inverse(camera);
-  glUniformMatrix4fv(view_uniform, 1, GL_FALSE, glm::value_ptr(View));
-}
-
-void InitializeGLState() {
-  // Enable Z-buffer
-  glEnable(GL_DEPTH_TEST);
-  glDepthFunc(GL_LEQUAL);
-
-  // Enable polygon culling
-  glEnable(GL_CULL_FACE);
-  glFrontFace(GL_CCW);
-  glCullFace(GL_BACK);
-}
 
 // Keyboard press event handler
 void OnKeyPress(GLFWwindow* /* window */, int key, int /* scancode */, int action, int /* mods */) {
@@ -89,7 +50,7 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   // Try to create a window
-  auto window = glfwCreateWindow(SIZE, SIZE, "OpenGL", NULL, NULL);
+  auto window = glfwCreateWindow(SIZE, SIZE, "PPGSO gl_mesh", NULL, NULL);
   if (window == NULL) {
     std::cerr << "Failed to open GLFW window, your graphics card is probably only capable of OpenGL 2.1" << std::endl;
     glfwTerminate();
@@ -114,22 +75,30 @@ int main() {
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN); // Hide mouse cursor
 
   // Load shaders
-  GLint program_id = ShaderProgram(gl_mesh_vert, gl_mesh_frag);
+  auto program = ShaderPtr(new Shader{gl_mesh_vert, gl_mesh_frag});
+  program->Use();
 
-  // Initialize OpenGL state
-  InitializeGLState();
+  // Load textures
+  auto sphereTexture = TexturePtr(new Texture{"sphere.rgb", 256, 256});
+  auto cursorTexture = TexturePtr(new Texture{"lena.rgb", 512, 512});
 
-  // Create objects from OBJ files with the specified textures
-  auto object0 = Mesh(
-    program_id, // Render object with this program (ID)
-    "sphere.obj", // OBJ file
-    "sphere.rgb", 256, 256 // Texture file (and its width, height)
-  );
-  auto object1 = Mesh(program_id, "sphere.obj", "sphere.rgb", 256, 256);
-  auto cursor = Mesh(program_id, "cursor.obj", "lena.rgb", 512, 512);
+  // Load mesh data
+  auto sphere = Mesh{
+          program,      // Associate Position and TexCoord inputs with this program)
+          "sphere.obj", // OBJ file to load data from
+  };
+  auto cursor = Mesh{program, "quad.obj"};
 
-  float time = 0;
-  float prevTime = 0;
+  // Enable Z-buffer
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LEQUAL);
+
+  // Enable polygon culling
+  glEnable(GL_CULL_FACE);
+  glFrontFace(GL_CCW);
+  glCullFace(GL_BACK);
+
+  float time;
 
   // Main execution loop
   while (!glfwWindowShouldClose(window)) {
@@ -138,34 +107,43 @@ int main() {
     // Clear depth and color buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if (animationEnabled) time += (float) glfwGetTime() - prevTime;
-    prevTime = (float) glfwGetTime();
+    if (animationEnabled) time = (float) glfwGetTime();
+
+    // Create object matrices
+    auto centerSphereMat = glm::rotate(glm::mat4(1.0f), time, glm::vec3(0.5f, 1.0f, 0.0f));
+    auto smallSphereMat = glm::translate(glm::mat4(1.0f), glm::vec3(sin(time), cos(time), 0));
+    smallSphereMat = glm::scale(smallSphereMat, glm::vec3(0.5f, 0.5f, 0.5f));
 
     // Camera position/rotation - for example, translate camera a bit backwards (positive value in Z axis), so we can see the objects
-    glm::mat4 cameraMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 2.5f));
+    auto cameraMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.5f));
+    program->SetMatrix(cameraMat, "ViewMatrix");
 
-    // --- Draw objects using perspective projection (spheres) ---
-    // Create object matrices
-    glm::mat4 object0ModelMat = glm::rotate(glm::mat4(1.0f), time, glm::vec3(0.5f, 1.0f, 0.0f));
-    glm::mat4 object1ModelMat = glm::translate(glm::mat4(1.0f), glm::vec3(sin(time), cos(time), 0));
-    object1ModelMat = glm::scale(object1ModelMat, glm::vec3(0.5f, 0.5f, 0.5f));
-
-    // Update camera with perspective projection
-    UpdateProjection(program_id, true, cameraMat);
+    // Update camera position with perspective projection
+    program->SetMatrix(glm::perspective(45.0f, 1.0f, 0.1f, 10.0f), "ProjectionMatrix");
 
     // Render objects
-    object0.render(object0ModelMat);
-    object1.render(object1ModelMat);
+    program->SetTexture(sphereTexture, "Texture");
 
-    // --- Draw objects using orthographic projection (mouse "cursor") ---
-    // Create object matrix
-    glm::mat4 cursorModelMat = glm::translate(glm::mat4(1.0f), glm::vec3(mousePosX, mousePosY, 0.0f));
+    // Central sphere
+    program->SetMatrix(centerSphereMat, "ModelMatrix");
+    sphere.Render();
 
+    // Smaller sphere
+    program->SetMatrix(smallSphereMat, "ModelMatrix");
+    sphere.Render();
+
+    // Draw cursor using orthographic projection
     // Update camera with orthographic projection
-    UpdateProjection(program_id, false, cameraMat);
+    program->SetMatrix(glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1000.0f, 1000.0f), "ProjectionMatrix");
+
+    // Create object matrix
+    auto cursorMat = glm::translate(glm::mat4(1.0f), glm::vec3(mousePosX, mousePosY, 0.0f));
+    cursorMat = glm::scale(cursorMat, glm::vec3(0.1f, 0.1f, 0.1f));
 
     // Render objects
-    cursor.render(cursorModelMat);
+    program->SetTexture(cursorTexture, "Texture");
+    program->SetMatrix(cursorMat, "ModelMatrix");
+    cursor.Render();
 
     // Display result
     glfwSwapBuffers(window);
