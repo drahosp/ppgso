@@ -1,7 +1,7 @@
 #ifndef PPGSO_CAMERA_H
 #define PPGSO_CAMERA_H
 
-#include <Memory>
+#include <memory>
 
 #include <glm/detail/type_mat.hpp>
 #include <glm/detail/type_mat4x4.hpp>

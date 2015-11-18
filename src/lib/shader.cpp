@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include <GL/glew.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "texture.h"
@@ -68,7 +69,7 @@ Shader::Shader(const std::string &vertex_shader_code, const std::string &fragmen
 
 Shader::~Shader() {
   glDeleteProgram( program );
-};
+}
 
 void Shader::Use() {
   glUseProgram(program);
@@ -105,7 +106,7 @@ void Shader::SetFloat(float value, const std::string &name) {
   glUniform1f(uniform, value);
 }
 
-GLuint Shader::GetProgram() { return program; };
+GLuint Shader::GetProgram() { return program; }
 
 void Shader::SetVector(glm::vec2 vector, const std::string &name) {
   auto uniform = GetUniformLocation(name.c_str());

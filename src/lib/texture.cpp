@@ -1,7 +1,6 @@
 #include <iostream>
-#include <vector>
 #include <fstream>
-#include <GL/glew.h>
+
 #include "texture.h"
 
 Texture::Texture(unsigned int width, unsigned int height) : width(width), height(height) {

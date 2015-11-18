@@ -38,6 +38,11 @@ Windows is a special case as always, however it is a lot easier if you avoid Vis
 
 A good alternative IDE for Windows is [QTCreator][7] that should work out of the box with TDM64 and CMake. For other IDEs see below.
 
+Running the examples
+----
+
+When using CLion you should first build the `run_install` target. This will generate a installation with all resources present in a `{project_root}/_install` folder. After that set the working direcotry to this folder for each target manually.
+
 Common pitfalls
 ---
 * NEVER store projects in paths and directories that contain spaces or non-ascii characters.

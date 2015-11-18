@@ -2,6 +2,7 @@
 #define PPGSO_SHADER_H
 
 #include <string>
+#include <memory>
 
 #include <GL/glew.h>
 #include <glm/mat4x4.hpp>

@@ -1,7 +1,10 @@
 #ifndef PPGSO_SPHERE_H
 #define PPGSO_SPHERE_H
 
+#include <memory>
+
 #include <GL/glew.h>
+
 #include "scene.h"
 #include "object.h"
 #include "mesh.h"

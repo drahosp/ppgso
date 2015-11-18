@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <memory>
 
 #include <GL/glew.h>
 #include <glm/mat4x4.hpp>

@@ -59,20 +59,22 @@ include_directories(
         ${CMAKE_SOURCE_DIR}
         ${CMAKE_CURRENT_BINARY_DIR})
 
-# ppgso_library
-add_library(libppgso
-        src/lib/mesh.cpp
-        src/lib/tiny_obj_loader.cpp
-        src/lib/shader.cpp
-        src/lib/texture.cpp
-        src/lib/tga.cpp)
-
 # Prepare libraries for linking
 set(LIBRARIES
         ${OPENGL_LIBRARIES}
         ${GLFW_LIBRARIES}
         ${GLEW_LIBRARIES}
         libppgso)
+
+# ppgso_library
+add_library(libppgso STATIC
+        src/lib/mesh.cpp
+        src/lib/tiny_obj_loader.cpp
+        src/lib/shader.cpp
+        src/lib/texture.cpp
+        src/lib/tga.cpp)
+
+target_link_libraries(libppgso ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})
 
 #
 # TARGETS
