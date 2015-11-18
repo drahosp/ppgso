@@ -430,13 +430,13 @@ bool TGAImage::scale(int w, int h) {
       }
     }
     erry += h;
-    oscanline += olinebytes;
+    oscanline = (int)(oscanline + olinebytes);
 
     while (erry >= (int) height) {
       if (erry >= (int) height << 1) // it means we jump over a scanline
         memcpy(tdata + nscanline + nlinebytes, tdata + nscanline, nlinebytes);
       erry -= height;
-      nscanline += nlinebytes;
+      nscanline = (int)(nscanline + nlinebytes);
     }
   }
   delete[] data;

@@ -49,7 +49,7 @@ void Asteroid::Render(Scene &scene) {
 }
 
 float Asteroid::Rand(float min, float max)  {
-  return ((max-min)*((float)rand()/RAND_MAX))+min;
+  return ((max-min)*((float)rand()/(float)RAND_MAX))+min;
 }
 
 // shared resources
