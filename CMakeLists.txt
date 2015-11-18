@@ -2,7 +2,7 @@
 # It should find bundled binary dependencies automatically when using MinGW compiler
 # On Linux and Mac the dependencies (glm, glew, glfw) need to be installed manually
 
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.1)
 project(ppgso CXX)
 
 #
@@ -12,7 +12,7 @@ project(ppgso CXX)
 # Basic CMake settings
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/_install)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
-set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Warnings for Debug mode
