@@ -84,10 +84,10 @@ target_link_libraries(libppgso ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})
 #
 
 # raw_gradient
-set(RAW_GRADIENT SRC
+set(RAW_GRADIENT_SRC
         src/raw_gradient/raw_gradient.cpp
         src/lib/tga.cpp)
-add_executable(raw_gradient ${RAW_GRADIENT})
+add_executable(raw_gradient ${RAW_GRADIENT_SRC})
 install(TARGETS raw_gradient DESTINATION .)
 
 # gl_gradient
