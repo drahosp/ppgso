@@ -1,4 +1,5 @@
 #include "mesh.h"
+#include "tiny_obj_loader.h"
 
 Mesh::Mesh(ShaderPtr program, const std::string &obj_file) {
   this->program = program;
@@ -70,6 +71,30 @@ void Mesh::initGeometry(const std::string &obj_file) {
   } else {
     std::cout << "Warning: OBJ file " << obj_file
               << " has no texture coordinates!" << std::endl;
+  }
+
+  // --- Normals ---
+  std::vector<GLfloat> normal_buffer;
+  for (int i = 0; i < (int)mesh.normals.size() / 3; i++) {
+    normal_buffer.push_back(mesh.normals[3 * i + 0]); // X
+    normal_buffer.push_back(mesh.normals[3 * i + 1]); // Y
+    normal_buffer.push_back(mesh.normals[3 * i + 2]); // Z
+  }
+
+  // Generate and upload a buffer with texture coordinates to GPU
+  glGenBuffers(1, &this->nbo);
+  glBindBuffer(GL_ARRAY_BUFFER, this->nbo);
+  glBufferData(GL_ARRAY_BUFFER, normal_buffer.size() * sizeof(GLfloat),
+               normal_buffer.data(), GL_STATIC_DRAW);
+
+  // Bind the buffer to "Normal" attribute in program
+  if (mesh.normals.size() > 0) {
+    auto normal_attib = program->GetAttribLocation("Normal");
+    glEnableVertexAttribArray(normal_attib);
+    glVertexAttribPointer(normal_attib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  } else {
+    std::cout << "Warning: OBJ file " << obj_file
+    << " has no normals!" << std::endl;
   }
 
   // --- Indices (define which triangles consists of which vertices) ---

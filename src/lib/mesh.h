@@ -17,7 +17,7 @@
 
 class Mesh {
   GLuint vao;
-  GLuint vbo, tbo;
+  GLuint vbo, tbo, nbo;
   GLuint ibo;
   ShaderPtr program;
   TexturePtr texture;
