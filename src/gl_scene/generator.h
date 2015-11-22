@@ -13,12 +13,10 @@ public:
   Generator();
   ~Generator();
 
-  virtual bool Update(Scene &scene, float dt);
-  virtual void Render(Scene &scene);
+  bool Update(Scene &scene, float dt) override;
+  void Render(Scene &scene) override;
 
   float time;
-private:
-  float Rand(float min, float max);
 };
 typedef std::shared_ptr< Generator > GeneratorPtr;
 

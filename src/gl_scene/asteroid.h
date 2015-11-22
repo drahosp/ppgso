@@ -21,9 +21,16 @@ public:
   ~Asteroid();
 
   // Implement object interface
-  virtual bool Update(Scene &scene, float dt);
-  virtual void Render(Scene &scene);
+  bool Update(Scene &scene, float dt) override;
+  void Render(Scene &scene) override;
 private:
+  // Generate explosion on position and scale, produce N smaller asteroid pieces
+  void Explode(Scene &scene, glm::vec3 explPosition, glm::vec3 explScale, int pieces);
+
+  // Age of the object in s
+  float age;
+
+  // Speed and rotational momentum
   glm::vec3 speed;
   glm::vec3 rotMomentum;
 
@@ -31,8 +38,6 @@ private:
   static MeshPtr mesh;
   static ShaderPtr shader;
   static TexturePtr texture;
-
-  float Rand(float min, float max);
 };
 typedef std::shared_ptr<Asteroid> AsteroidPtr;
 

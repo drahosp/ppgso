@@ -19,3 +19,7 @@ void Object::GenerateModelMatrix() {
           * glm::orientate4(rotation)
           * glm::scale(glm::mat4(1.0f), scale);
 }
+
+float Object::Rand(float min, float max) {
+  return ((max - min) * ((float) rand() / (float) RAND_MAX)) + min;
+}

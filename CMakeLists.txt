@@ -153,12 +153,16 @@ set(GL_SCENE_SRC
         src/gl_scene/asteroid.cpp
         src/gl_scene/generator.cpp
         src/gl_scene/player.cpp
+        src/gl_scene/projectile.cpp
+        src/gl_scene/explosion.cpp
         src/gl_scene/space.cpp)
 generate_shaders(GL_SCENE_SHADERS
         src/gl_scene/space_frag.glsl
         src/gl_scene/space_vert.glsl
         src/gl_scene/object_frag.glsl
-        src/gl_scene/object_vert.glsl)
+        src/gl_scene/object_vert.glsl
+        src/gl_scene/explosion_frag.glsl
+        src/gl_scene/explosion_vert.glsl)
 add_executable(gl_scene ${GL_SCENE_SRC} ${GL_SCENE_SHADERS})
 target_link_libraries(gl_scene ${LIBRARIES})
 install(TARGETS gl_scene DESTINATION .)

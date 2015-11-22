@@ -19,6 +19,7 @@ Space::~Space() {
 }
 
 bool Space::Update(Scene &scene, float dt) {
+  // Offset for UV mapping, creates illusion of scrolling
   offset -= dt/5;
 
   GenerateModelMatrix();
@@ -26,17 +27,13 @@ bool Space::Update(Scene &scene, float dt) {
 }
 
 void Space::Render(Scene &scene) {
-  // NOTE: this objedt does not use camera
+  // NOTE: this object does not use camera, just renders the entire quad as is
   shader->Use();
 
-  // Animate texture offset
+  // Pass UV mapping offset to the shader
   shader->SetFloat(offset, "Offset");
 
-  // use camera
-  shader->SetMatrix(scene.camera->projectionMatrix, "ProjectionMatrix");
-  shader->SetMatrix(scene.camera->viewMatrix, "ViewMatrix");
-
-  // render mesh
+  // Render mesh
   shader->SetMatrix(modelMatrix, "ModelMatrix");
   shader->SetTexture(texture, "Texture");
   mesh->Render();

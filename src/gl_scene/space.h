@@ -12,8 +12,8 @@ public:
   Space();
   ~Space();
 
-  virtual bool Update(Scene &scene, float dt);
-  virtual void Render(Scene &scene);
+  bool Update(Scene &scene, float dt) override;
+  void Render(Scene &scene) override;
 
 private:
   float offset;

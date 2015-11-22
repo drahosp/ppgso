@@ -6,7 +6,7 @@ bool Generator::Update(Scene &scene, float dt) {
   time += dt;
 
   // Add object to scene when time reaches certain level
-  if (time > 1) {
+  if (time > .3) {
     auto obj = AsteroidPtr(new Asteroid());
     obj->position = this->position;
     obj->position.x += Rand(-20, 20);
@@ -26,8 +26,4 @@ Generator::~Generator() {
 
 Generator::Generator() {
   time = 0;
-}
-
-float Generator::Rand(float min, float max) {
-  return ((max-min)*((float)rand()/(float)RAND_MAX))+min;
 }
