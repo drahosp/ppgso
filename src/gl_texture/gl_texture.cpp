@@ -58,8 +58,8 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   // Try to create a window
-  auto window = glfwCreateWindow( SIZE, SIZE, "PPGSO gl_texture", NULL, NULL);
-  if (window == NULL) {
+  auto window = glfwCreateWindow( SIZE, SIZE, "PPGSO gl_texture", nullptr, nullptr);
+  if (!window) {
     std::cerr << "Failed to open GLFW window, your graphics card is probably only capable of OpenGL 2.1" << std::endl;
     glfwTerminate();
     return EXIT_FAILURE;

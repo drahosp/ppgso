@@ -153,7 +153,7 @@ bool TGAImage::unload_rle_data(std::ofstream &out) {
   return true;
 }
 
-TGAImage::TGAImage() : data(NULL), width(0), height(0), bytespp(0) { }
+TGAImage::TGAImage() : data(nullptr), width(0), height(0), bytespp(0) { }
 
 TGAImage::TGAImage(int w, int h, int bpp, void *image)
         : width(w), height(h), bytespp(bpp) {
@@ -161,7 +161,7 @@ TGAImage::TGAImage(int w, int h, int bpp, void *image)
 
   data = new unsigned char[nbytes];
 
-  if (image == NULL) {
+  if (!image) {
     std::memset(data, 0, nbytes);
   } else {
     std::memcpy(data, image, nbytes);
@@ -173,7 +173,7 @@ TGAImage::TGAImage(int w, int h, int bpp, void *image)
 }
 
 TGAImage::TGAImage(const TGAImage &img)
-        : data(NULL), width(img.width), height(img.height), bytespp(img.bytespp) {
+        : data(nullptr), width(img.width), height(img.height), bytespp(img.bytespp) {
   unsigned long nbytes = width * height * bytespp;
 
   data = new unsigned char[nbytes];
@@ -202,7 +202,7 @@ TGAImage &TGAImage::operator=(const TGAImage &img) {
 bool TGAImage::read_tga_file(const std::string &filename) {
   if (data)
     delete[] data;
-  data = NULL;
+  data = nullptr;
   std::ifstream in;
   in.open(filename, std::ios::binary);
 

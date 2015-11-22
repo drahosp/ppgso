@@ -11,7 +11,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "mesh.h"
-#include "shader.h"
 
 #include "gl_mesh_frag.h"
 #include "gl_mesh_vert.h"
@@ -52,8 +51,8 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   // Try to create a window
-  auto window = glfwCreateWindow(SIZE, SIZE, "PPGSO gl_mesh", NULL, NULL);
-  if (window == NULL) {
+  auto window = glfwCreateWindow(SIZE, SIZE, "PPGSO gl_mesh", nullptr, nullptr);
+  if (!window) {
     std::cerr << "Failed to open GLFW window, your graphics card is probably only capable of OpenGL 2.1" << std::endl;
     glfwTerminate();
     return EXIT_FAILURE;
@@ -100,7 +99,7 @@ int main() {
   glFrontFace(GL_CCW);
   glCullFace(GL_BACK);
 
-  float time;
+  float time = 0;
 
   // Main execution loop
   while (!glfwWindowShouldClose(window)) {

@@ -59,7 +59,7 @@ public:
 
   TGAImage();
 
-  TGAImage(int w, int h, int bpp, void *image = NULL);
+  TGAImage(int w, int h, int bpp, void *image = nullptr);
 
   TGAImage(const TGAImage &img);
 
