@@ -29,7 +29,7 @@ add_definitions ( -DGLM_FORCE_RADIANS )
 # Add custom target for installation in CLion
 add_custom_target(run_install COMMAND ${CMAKE_MAKE_PROGRAM} install)
 
-# Use generate_shader function to vonvert .glsl sources to C++ headers
+# Use generate_shader function to convert .glsl sources to C++ headers
 include(shaders)
 
 #

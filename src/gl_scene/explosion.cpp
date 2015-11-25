@@ -55,7 +55,7 @@ void Explosion::Render(Scene &scene) {
 
 bool Explosion::Update(Scene &scene, float dt) {
   // Update scale and rotation
-  scale = scale * 1.1f;
+  scale = scale * ( 1.0f + dt * 5.0f);
   rotation += rotMomentum * dt;
   position += speed * dt;
 
