@@ -115,10 +115,10 @@ void Shader::SetVector(glm::vec2 vector, const std::string &name) {
 
 void Shader::SetVector(glm::vec3 vector, const std::string &name) {
   auto uniform = GetUniformLocation(name.c_str());
-  glUniform2fv(uniform, 1, glm::value_ptr(vector));
+  glUniform3fv(uniform, 1, glm::value_ptr(vector));
 }
 
 void Shader::SetVector(glm::vec4 vector, const std::string &name) {
   auto uniform = GetUniformLocation(name.c_str());
-  glUniform2fv(uniform, 1, glm::value_ptr(vector));
+  glUniform4fv(uniform, 1, glm::value_ptr(vector));
 }
