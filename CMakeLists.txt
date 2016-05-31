@@ -167,6 +167,17 @@ add_executable(gl_scene ${GL_SCENE_SRC} ${GL_SCENE_SHADERS})
 target_link_libraries(gl_scene ${LIBRARIES})
 install(TARGETS gl_scene DESTINATION .)
 
+# gl_framebuffer
+set(GL_FRAMEBUFFER_SRC src/gl_framebuffer/gl_framebuffer.cpp)
+generate_shaders(GL_FRAMEBUFFER_SHADERS
+        src/gl_framebuffer/gl_framebuffer_vert.glsl
+        src/gl_framebuffer/gl_framebuffer_frag.glsl
+        src/gl_framebuffer/texture_vert.glsl
+        src/gl_framebuffer/texture_frag.glsl)
+add_executable(gl_framebuffer ${GL_FRAMEBUFFER_SRC} ${GL_FRAMEBUFFER_SHADERS})
+target_link_libraries(gl_framebuffer ${LIBRARIES})
+install(TARGETS gl_framebuffer DESTINATION .)
+
 # ADD YOUR PROJECT HERE
 #set(MY_PROJECT_SRC src/my_project/my_project.cpp)
 #generate_shaders(MY_PROJECT_SHADERS src/my_project/my_project_vert.glsl src/my_project/my_project_frag.glsl)
