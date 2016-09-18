@@ -6,9 +6,6 @@
 #include <iostream>
 #include <fstream>
 
-// A header implementation of a TGAImage object
-#include "tga.h"
-
 // Size of the framebuffer
 const unsigned int SIZE = 512;
 
@@ -21,6 +18,7 @@ struct Pixel {
 
 int main() {
   // Initialize a framebuffer
+  // NOTE: The framebuffer is allocated on the stack. For bigger sizes this should be changed to a heap allocation.
   Pixel framebuffer[SIZE][SIZE];
 
   // Example: Generate a simple gradient
@@ -33,20 +31,12 @@ int main() {
   }
 
   // Task1: Load RAW image file here instead
-  // Task2: Apply a convolution filter to the loaded image
-  // Task3: Merge multiple images using alpha blending
-  // Task4: Draw lines and Bezier curves
 
   // Save the raw image to a file
   std::cout << "Generating result.rgb file ..." << std::endl;
   std::ofstream raw("result.rgb", std::ios::binary);
   raw.write((char *)framebuffer, sizeof(framebuffer));
   raw.close();
-
-  // Helper object to save the framebuffer as TGA image
-  std::cout << "Generating result.tga file ..." << std::endl;
-  TGAImage tga(SIZE, SIZE, 3, framebuffer);
-  tga.write_tga_file("result.tga", true);
 
   std::cout << "Done." << std::endl;
   return EXIT_SUCCESS;

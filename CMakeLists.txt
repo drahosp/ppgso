@@ -10,23 +10,12 @@ project(ppgso CXX)
 #
 
 # Basic CMake settings
-set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/_install)
+set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/_install)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-# Warnings for Debug mode
-option(USE_STRICT_COMPILE_WARNINGS "Use strict compilation warnings in debug mode." ON)
-if (USE_STRICT_COMPILE_WARNINGS)
-  # Assuming Clang and GCC
-  set(STRICT_COMPILE_WARNINGS "-Wpedantic -Wall -Wfloat-equal -Wextra -Wsign-promo -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-unused-parameter")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${STRICT_COMPILE_WARNINGS}")
-endif ()
-
-# Make sure GLM uses radians
-add_definitions ( -DGLM_FORCE_RADIANS )
-
 # Add custom target for installation in CLion
+
 add_custom_target(run_install COMMAND ${CMAKE_MAKE_PROGRAM} install)
 
 # Use generate_shader function to convert .glsl sources to C++ headers
@@ -38,10 +27,23 @@ include(shaders)
 
 # Set up external dependencies for Windows users
 if (MINGW)
-  set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "${CMAKE_SOURCE_DIR}/dependencies/mingw/include/")
-  set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "${CMAKE_SOURCE_DIR}/dependencies/mingw/lib/")
+  set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "${CMAKE_SOURCE_DIR}/dependencies/include/")
+  set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "${CMAKE_SOURCE_DIR}/dependencies/lib/mingw")
+elseif (MSVC)
+  set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "${CMAKE_SOURCE_DIR}/dependencies/include/")
+  set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "${CMAKE_SOURCE_DIR}/dependencies/lib/vc2015")
+  set(STRICT_COMPILE_FLAGS)
 endif ()
 
+# Warnings for Debug mode
+option(USE_STRICT_COMPILE_WARNINGS "Use strict compilation warnings in debug mode." ON)
+# These compile flags should apply for GCC and Clang compilers
+set(STRICT_COMPILE_FLAGS "-Wpedantic -Wall -Weverything -Wno-c++98-compat -Wfloat-equal -Wextra -Wsign-promo -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-unused-parameter")
+if (USE_STRICT_COMPILE_WARNINGS)
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${STRICT_COMPILE_FLAGS}")
+endif ()
+
+# Find required packages
 find_package(GLFW3 REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(GLM REQUIRED)
@@ -52,8 +54,18 @@ if (NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX "../_install")
 endif ()
 
-# Include header directories
-include_directories(
+# PPGSO library
+add_library(libppgso STATIC
+        src/lib/mesh.cpp
+        src/lib/tiny_obj_loader.cpp
+        src/lib/shader.cpp
+        src/lib/texture.cpp)
+# Make sure GLM uses radians and static GLEW library
+target_compile_definitions(libppgso PUBLIC -DGLM_FORCE_RADIANS -DGLEW_STATIC )
+# Link to GLFW, GLEW and OpenGL
+target_link_libraries(libppgso PUBLIC ${GLFW_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES})
+# Pass on include directories
+target_include_directories(libppgso PUBLIC
         src/lib
         ${GLFW_INCLUDE_DIRS}
         ${GLEW_INCLUDE_DIRS}
@@ -62,31 +74,13 @@ include_directories(
         ${CMAKE_SOURCE_DIR}
         ${CMAKE_CURRENT_BINARY_DIR})
 
-# Prepare libraries for linking
-set(LIBRARIES
-        ${OPENGL_LIBRARIES}
-        ${GLFW_LIBRARIES}
-        ${GLEW_LIBRARIES}
-        libppgso)
-
-# ppgso_library
-add_library(libppgso STATIC
-        src/lib/mesh.cpp
-        src/lib/tiny_obj_loader.cpp
-        src/lib/shader.cpp
-        src/lib/texture.cpp
-        src/lib/tga.cpp)
-
-target_link_libraries(libppgso ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})
-
 #
 # TARGETS
 #
 
 # raw_gradient
 set(RAW_GRADIENT_SRC
-        src/raw_gradient/raw_gradient.cpp
-        src/lib/tga.cpp)
+        src/raw_gradient/raw_gradient.cpp)
 add_executable(raw_gradient ${RAW_GRADIENT_SRC})
 install(TARGETS raw_gradient DESTINATION .)
 
@@ -96,7 +90,7 @@ generate_shaders(GL_GRADIENT_SHADERS
         src/gl_gradient/gl_gradient_vert.glsl
         src/gl_gradient/gl_gradient_frag.glsl)
 add_executable(gl_gradient ${GL_GRADIENT_SRC} ${GL_GRADIENT_SHADERS})
-target_link_libraries(gl_gradient ${LIBRARIES})
+target_link_libraries(gl_gradient libppgso)
 install(TARGETS gl_gradient DESTINATION .)
 
 # gl_texture
@@ -105,7 +99,7 @@ generate_shaders(GL_TEXTURE_SHADERS
         src/gl_texture/gl_texture_vert.glsl
         src/gl_texture/gl_texture_frag.glsl)
 add_executable(gl_texture ${GL_TEXTURE_SRC} ${GL_TEXTURE_SHADERS})
-target_link_libraries(gl_texture ${LIBRARIES})
+target_link_libraries(gl_texture libppgso)
 install(TARGETS gl_texture DESTINATION .)
 
 # gl_animate
@@ -114,7 +108,7 @@ generate_shaders(GL_ANIMATE_SHADERS
         src/gl_animate/gl_animate_vert.glsl
         src/gl_animate/gl_animate_frag.glsl)
 add_executable(gl_animate ${GL_ANIMATE_SRC} ${GL_ANIMATE_SHADERS})
-target_link_libraries(gl_animate ${LIBRARIES})
+target_link_libraries(gl_animate libppgso)
 install(TARGETS gl_animate DESTINATION .)
 
 # gl_transform
@@ -123,7 +117,7 @@ generate_shaders(GL_TRANSFORM_SHADERS
         src/gl_transform/gl_transform_vert.glsl
         src/gl_transform/gl_transform_frag.glsl)
 add_executable(gl_transform ${GL_TRANSFORM_SRC} ${GL_TRANSFORM_SHADERS})
-target_link_libraries(gl_transform ${LIBRARIES})
+target_link_libraries(gl_transform libppgso)
 install(TARGETS gl_transform DESTINATION .)
 
 # gl_projection
@@ -132,7 +126,7 @@ generate_shaders(GL_PROJECTION_SHADERS
         src/gl_projection/gl_projection_vert.glsl
         src/gl_projection/gl_projection_frag.glsl)
 add_executable(gl_projection ${GL_PROJECTION_SRC} ${GL_PROJECTION_SHADERS})
-target_link_libraries(gl_projection ${LIBRARIES})
+target_link_libraries(gl_projection libppgso)
 install(TARGETS gl_projection DESTINATION .)
 
 # gl_mesh
@@ -141,7 +135,7 @@ generate_shaders(GL_MESH_SHADERS
         src/gl_mesh/gl_mesh_vert.glsl
         src/gl_mesh/gl_mesh_frag.glsl)
 add_executable(gl_mesh ${GL_MESH_SRC} ${GL_MESH_SHADERS})
-target_link_libraries(gl_mesh ${LIBRARIES})
+target_link_libraries(gl_mesh libppgso)
 install(TARGETS gl_mesh DESTINATION .)
 
 # gl_scene
@@ -164,7 +158,7 @@ generate_shaders(GL_SCENE_SHADERS
         src/gl_scene/explosion_frag.glsl
         src/gl_scene/explosion_vert.glsl)
 add_executable(gl_scene ${GL_SCENE_SRC} ${GL_SCENE_SHADERS})
-target_link_libraries(gl_scene ${LIBRARIES})
+target_link_libraries(gl_scene libppgso)
 install(TARGETS gl_scene DESTINATION .)
 
 # gl_framebuffer
@@ -175,14 +169,14 @@ generate_shaders(GL_FRAMEBUFFER_SHADERS
         src/gl_framebuffer/texture_vert.glsl
         src/gl_framebuffer/texture_frag.glsl)
 add_executable(gl_framebuffer ${GL_FRAMEBUFFER_SRC} ${GL_FRAMEBUFFER_SHADERS})
-target_link_libraries(gl_framebuffer ${LIBRARIES})
+target_link_libraries(gl_framebuffer libppgso)
 install(TARGETS gl_framebuffer DESTINATION .)
 
 # ADD YOUR PROJECT HERE
 #set(MY_PROJECT_SRC src/my_project/my_project.cpp)
 #generate_shaders(MY_PROJECT_SHADERS src/my_project/my_project_vert.glsl src/my_project/my_project_frag.glsl)
 #add_executable(my_project ${MY_PROJECT_SRC} ${MY_PROJECT_SHADERS})
-#target_link_libraries(my_project ${LIBRARIES})
+#target_link_libraries(my_project libppgso)
 #install (TARGETS my_project DESTINATION .)
 
 #
@@ -190,10 +184,3 @@ install(TARGETS gl_framebuffer DESTINATION .)
 #
 
 install(DIRECTORY data/ DESTINATION .)
-
-# Install runtime dlls to destination when on Windows
-if (MINGW)
-  install(FILES ${GLFW_LIBRARIES} ${GLEW_LIBRARIES} DESTINATION .)
-  # Install dlls into binary dir for development and debugging
-  file(COPY ${GLFW_LIBRARIES} ${GLEW_LIBRARIES} DESTINATION ${CMAKE_BINARY_DIR})
-endif ()
