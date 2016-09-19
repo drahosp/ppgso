@@ -24,8 +24,8 @@ int main() {
   // Example: Generate a simple gradient
   for (unsigned int x = 0; x < SIZE; ++x) {
     for (unsigned int y = 0; y < SIZE; ++y) {
-      framebuffer[x][y].r = ((unsigned char)((unsigned int)x / 2));
-      framebuffer[x][y].g = ((unsigned char)((unsigned int)y / 2));
+      framebuffer[x][y].r = static_cast<unsigned char>(x / 2);
+      framebuffer[x][y].g = static_cast<unsigned char>(y / 2);
       framebuffer[x][y].b = 0;
     }
   }
@@ -35,7 +35,7 @@ int main() {
   // Save the raw image to a file
   std::cout << "Generating result.rgb file ..." << std::endl;
   std::ofstream raw("result.rgb", std::ios::binary);
-  raw.write((char *)framebuffer, sizeof(framebuffer));
+  raw.write(reinterpret_cast<char *>(framebuffer), sizeof(framebuffer));
   raw.close();
 
   std::cout << "Done." << std::endl;

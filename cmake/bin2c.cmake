@@ -5,8 +5,10 @@ function(bin2c INFILE VARNAME OUTFILE)
   set(HEXPOS 0)
   file(WRITE ${OUTFILE}
           "/* generated from ${INFILE}; do not edit */\n"
+          "#ifndef _${VARNAME}_H_\n"
+          "#define _${VARNAME}_H_\n"
           "#include <string>\n"
-          "const std::string ${VARNAME} {")
+          "const static std::string ${VARNAME} {")
   while (${HEXPOS} LESS ${XRSLEN})
     math(EXPR LPOS "${HEXPOS} % 32")
     if (NOT ${LPOS})
@@ -19,7 +21,9 @@ function(bin2c INFILE VARNAME OUTFILE)
       file(APPEND ${OUTFILE} ",")
     endif ()
   endwhile ()
-  file(APPEND ${OUTFILE} "};\n")
+  file(APPEND ${OUTFILE}
+          "};\n"
+          "#endif // _${VARNAME}_H_\n")
 endfunction()
 
 bin2c("${SRC_FILE}" "${SYMBOL}" "${OUT_FILE}")

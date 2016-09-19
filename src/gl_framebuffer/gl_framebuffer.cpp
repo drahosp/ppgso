@@ -95,14 +95,14 @@ int main() {
   glGenRenderbuffers(1, &rbo);
   glBindRenderbuffer(GL_RENDERBUFFER, rbo);
   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, SIZE, SIZE);
-  glBindRenderbuffer(GL_RENDERBUFFER, NULL);
+  glBindRenderbuffer(GL_RENDERBUFFER, 0);
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
     std::cerr << "Cannot create framebuffer!" << std::endl;
   }
 
-  glBindFramebuffer(GL_FRAMEBUFFER, NULL);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
   // Set shader values
   program1->SetMatrix(projection, "ProjectionMatrix");
@@ -157,7 +157,7 @@ int main() {
     // Part 2 - Render the final scene to screen
     // --------
     // Set rendering target to screen
-    glBindFramebuffer(GL_FRAMEBUFFER, NULL);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Clear the framebuffer
     glClearColor(.2f,.2f,.2f,0);
