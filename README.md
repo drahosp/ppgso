@@ -41,7 +41,7 @@ A good alternative IDE for Windows is [QTCreator][7] that should work out of the
 Running the examples
 ----
 
-When using CLion you should first build the `run_install` target. This will generate a installation with all resources present in a `{project_root}/_install` folder. After that set the working direcotry to this folder for each target manually.
+When using CLion you should first build the `run_install` target. This will generate a installation with all resources present in a `{project_root}/_install` folder. After that set the working directory to this folder for each target manually.
 
 Common pitfalls
 ---
