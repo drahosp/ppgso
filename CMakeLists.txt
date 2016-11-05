@@ -183,6 +183,54 @@ add_executable(gl_scene ${GL_SCENE_SRC} ${GL_SCENE_SHADERS})
 target_link_libraries(gl_scene libppgso)
 install(TARGETS gl_scene DESTINATION .)
 
+# TASKs
+
+# task1_invert
+set(TASK1_SRC src/task1_invert/task1_invert.cpp)
+add_executable(task1_invert ${TASK1_SRC})
+install(TARGETS task1_invert DESTINATION .)
+
+# task2_bresenham
+set(TASK2_SRC src/task2_bresenham/task2_bresenham.cpp)
+add_executable(task2_bresenham ${TASK2_SRC})
+install(TARGETS task2_bresenham DESTINATION .)
+
+# task3_bezier
+set(TASK3_SRC src/task3_bezier/task3_bezier.cpp)
+generate_shaders(TASK3_SHADERS
+        src/task3_bezier/task3_bezier_vert.glsl
+        src/task3_bezier/task3_bezier_frag.glsl)
+add_executable(task3_bezier ${TASK3_SRC} ${TASK3_SHADERS})
+target_link_libraries(task3_bezier libppgso)
+install(TARGETS task3_bezier DESTINATION .)
+
+# task4_convolution
+set(TASK4_SRC src/task4_convolution/task4_convolution.cpp)
+generate_shaders(TASK4_SHADERS
+        src/task4_convolution/task4_convolution_vert.glsl
+        src/task4_convolution/task4_convolution_frag.glsl)
+add_executable(task4_convolution ${TASK4_SRC} ${TASK4_SHADERS})
+target_link_libraries(task4_convolution libppgso)
+install(TARGETS task4_convolution DESTINATION .)
+
+# task5_2dshapes
+set(TASK5_SRC src/task5_2dshapes/task5_2dshapes.cpp)
+generate_shaders(TASK5_SHADERS
+        src/task5_2dshapes/task5_2dshapes_vert.glsl
+        src/task5_2dshapes/task5_2dshapes_frag.glsl)
+add_executable(task5_2dshapes ${TASK5_SRC} ${TASK5_SHADERS})
+target_link_libraries(task5_2dshapes libppgso)
+install(TARGETS task5_2dshapes DESTINATION .)
+
+# task6_bezier_surface
+set(TASK6_SRC src/task6_bezier_surface/task6_bezier_surface.cpp)
+generate_shaders(TASK6_SHADERS
+        src/task6_bezier_surface/task6_bezier_surface_vert.glsl
+        src/task6_bezier_surface/task6_bezier_surface_frag.glsl)
+add_executable(task6_bezier_surface ${TASK6_SRC} ${TASK6_SHADERS})
+target_link_libraries(task6_bezier_surface libppgso)
+install(TARGETS task6_bezier_surface DESTINATION .)
+
 # ADD YOUR PROJECT HERE
 #set(MY_PROJECT_SRC src/my_project/my_project.cpp)
 #generate_shaders(MY_PROJECT_SHADERS src/my_project/my_project_vert.glsl src/my_project/my_project_frag.glsl)
