@@ -15,7 +15,6 @@ using namespace glm;
 using namespace ppgso;
 
 const unsigned int SIZE = 512;
-const float PI = pi<float>();
 
 // Our custom application
 class MeshWindow : public Window {

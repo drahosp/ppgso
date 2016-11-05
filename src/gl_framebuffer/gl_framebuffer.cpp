@@ -18,7 +18,6 @@ using namespace glm;
 using namespace ppgso;
 
 const unsigned int SIZE = 512;
-const float PI = pi<float>();
 
 class FramebufferWindow : public Window {
 private:
