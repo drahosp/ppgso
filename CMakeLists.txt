@@ -32,7 +32,7 @@ if (MINGW)
 elseif (MSVC)
   set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "${CMAKE_SOURCE_DIR}/dependencies/include/")
   set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "${CMAKE_SOURCE_DIR}/dependencies/lib/vc2015")
-  set(USE_STRICT_COMPILE_WARNINGS OFF)
+  set(USE_STRICT_COMPILE_WARNINGS OFF CACHE BOOL "" FORCE)
 endif ()
 
 # Warnings for Debug mode
