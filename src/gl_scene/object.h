@@ -5,11 +5,7 @@
 #include <list>
 #include <map>
 
-#include <glm/detail/type_mat.hpp>
-#include <glm/detail/type_mat4x4.hpp>
-#include <glm/detail/type_vec3.hpp>
-
-#define PI 3.14159265358979323846f
+#include <glm/glm.hpp>
 
 // Forward declare a scene
 class Scene;
@@ -19,8 +15,7 @@ class Scene;
 // Generally we also want to keep position, rotation and scale for each object to generate a modelMatrix
 class Object {
 public:
-  Object();
-  virtual ~Object();
+  virtual ~Object() {};
 
   // Primary interface Update should update the objects modelMatrix and return true
   // If update returns false than the object will be removed from the scene
@@ -30,10 +25,10 @@ public:
   virtual void Render(Scene &scene) = 0;
 
   // Object properties
-  glm::vec3 position;
-  glm::vec3 rotation;
-  glm::vec3 scale;
-  glm::mat4 modelMatrix;
+  glm::vec3 position{0,0,0};
+  glm::vec3 rotation{0,0,0};
+  glm::vec3 scale{1,1,1};
+  glm::mat4 modelMatrix{1};
 
 protected:
   // Generate modelMatrix from properties
@@ -41,6 +36,5 @@ protected:
   // Random float generator
   float Rand(float min, float max);
 };
-typedef std::shared_ptr<Object> ObjectPtr;
 
 #endif //PPGSO_OBJECT_H

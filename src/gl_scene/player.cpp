@@ -9,21 +9,30 @@
 
 #include <GLFW/glfw3.h>
 
+using namespace std;
+using namespace glm;
+using namespace ppgso;
+
+// shared resources
+shared_ptr<Mesh> Player::mesh;
+shared_ptr<Texture> Player::texture;
+shared_ptr<Shader> Player::shader;
+
 Player::Player() {
   // Reset fire delay
   fireDelay = 0;
   // Set the rate of fire
   fireRate = 0.3f;
   // Fire offset;
-  fireOffset = glm::vec3(0.7f,0.0f,0.0f);
+  fireOffset = {0.7f,0.0f,0.0f};
 
   // Scale the default model
   scale *= 3.0f;
 
   // Initialize static resources if needed
-  if (!shader) shader = ShaderPtr(new Shader{object_vert, object_frag});
-  if (!texture) texture = TexturePtr(new Texture{"corsair.rgb", 256, 512});
-  if (!mesh) mesh = MeshPtr(new Mesh{shader, "corsair.obj"});
+  if (!shader) shader = make_shared<Shader>(object_vert, object_frag);
+  if (!texture) texture = make_shared<Texture>("corsair.rgb", 256, 512);
+  if (!mesh) mesh = make_shared<Mesh>(shader, "corsair.obj");
 }
 
 Player::~Player() {
@@ -45,7 +54,7 @@ bool Player::Update(Scene &scene, float dt) {
 
     if (glm::distance(position, asteroid->position) < asteroid->scale.y) {
       // Explode
-      auto explosion = ExplosionPtr(new Explosion{});
+      auto explosion = make_shared<Explosion>();
       explosion->position = position;
       explosion->scale = scale * 3.0f;
       scene.objects.push_back(explosion);
@@ -73,7 +82,7 @@ bool Player::Update(Scene &scene, float dt) {
     // Invert file offset
     fireOffset = -fireOffset;
 
-    auto projectile = ProjectilePtr(new Projectile{});
+    auto projectile = make_shared<Projectile>();
     projectile->position = position + glm::vec3(0.0f, 0.0f, 0.3f) + fireOffset;
     scene.objects.push_back(projectile);
   }
@@ -95,7 +104,3 @@ void Player::Render(Scene &scene) {
   mesh->Render();
 }
 
-// shared resources
-MeshPtr Player::mesh;
-ShaderPtr Player::shader;
-TexturePtr Player::texture;

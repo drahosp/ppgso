@@ -7,120 +7,89 @@
 // - Controls: LEFT, RIGHT, "R" to reset, SPACE to fire
 
 #include <iostream>
-#include <vector>
 #include <map>
 #include <list>
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include <ppgso/ppgso.h>
 
-#include "scene.h"
 #include "camera.h"
+#include "scene.h"
 #include "generator.h"
 #include "player.h"
 #include "space.h"
 
+using namespace std;
+using namespace glm;
+using namespace ppgso;
+
 const unsigned int SIZE = 512;
 
-Scene scene;
+class SceneWindow : public Window {
+private:
+  Scene scene;
 
-// Set up the scene
-void InitializeScene() {
-  scene.objects.clear();
+  // Set up the scene
+  void InitializeScene() {
+    scene.objects.clear();
 
-  // Create a camera
-  auto camera = CameraPtr(new Camera{ 60.0f, 1.0f, 0.1f, 100.0f});
-  camera->position.z = -15.0f;
-  scene.camera = camera;
+    // Create a camera
+    auto camera = make_shared<Camera>(60.0f, 1.0f, 0.1f, 100.0f);
+    camera->position.z = -15.0f;
+    scene.camera = camera;
 
-  // Add space background
-  auto space = SpacePtr(new Space{});
-  scene.objects.push_back(space);
+    // Add space background
+    auto space = make_shared<Space>();
+    scene.objects.push_back(space);
 
-  // Add generator to scene
-  auto generator = GeneratorPtr(new Generator{});
-  generator->position.y = 10.0f;
-  scene.objects.push_back(generator);
+    // Add generator to scene
+    auto generator = make_shared<Generator>();
+    generator->position.y = 10.0f;
+    scene.objects.push_back(generator);
 
-  // Add player to the scene
-  auto player = PlayerPtr(new Player{});
-  player->position.y = -6;
-  scene.objects.push_back(player);
-}
+    // Add player to the scene
+    auto player = make_shared<Player>();
+    player->position.y = -6;
+    scene.objects.push_back(player);
+  }
 
-// Keyboard press event handler
-void OnKeyPress(GLFWwindow* /* window */, int key, int /* scancode */, int action, int /* mods */) {
-  scene.keyboard[key] = action;
+public:
+  SceneWindow(string title, unsigned int width, unsigned int height) : Window{title, width, height} {
+    HideCursor();
+    glfwSetInputMode(window, GLFW_STICKY_KEYS, 1);
 
-  // Reset
-  if (key == GLFW_KEY_R && action == GLFW_PRESS) {
+    // Initialize OpenGL state
+    // Enable Z-buffer
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+
+    // Enable polygon culling
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CCW);
+    glCullFace(GL_BACK);
+
     InitializeScene();
   }
-}
 
-// Mouse move event handler
-void OnMouseMove(GLFWwindow* /* window */, double xpos, double ypos) {
-  scene.mouse.x = xpos;
-  scene.mouse.y = ypos;
-}
+  // Keyboard press event handler
+  void onKey(int key, int scanCode, int action, int mods) {
+    scene.keyboard[key] = action;
 
-int main() {
-  // Initialize GLFW
-  if (!glfwInit()) {
-    std::cerr << "Failed to initialize GLFW!" << std::endl;
-    return EXIT_FAILURE;
+    // Reset
+    if (key == GLFW_KEY_R && action == GLFW_PRESS) {
+      InitializeScene();
+    }
   }
 
-  // Setup OpenGL context
-  glfwWindowHint(GLFW_SAMPLES, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-  // Try to create a window
-  auto window = glfwCreateWindow(SIZE, SIZE, "PPGSO gl_scene", nullptr, nullptr);
-  if (!window) {
-    std::cerr << "Failed to open GLFW window, your graphics card is probably only capable of OpenGL 2.1" << std::endl;
-    glfwTerminate();
-    return EXIT_FAILURE;
+  // Mouse move event handler
+  void onCursorPos(double cursorX, double cursorY) {
+    scene.cursor.x = cursorX;
+    scene.cursor.y = cursorY;
   }
 
-  // Finalize window setup
-  glfwMakeContextCurrent(window);
+  void onPool() {
+    // Track time
+    static float time = (float)glfwGetTime();
 
-  // Initialize GLEW
-  glewExperimental = GL_TRUE;
-  glewInit();
-  if (!glewIsSupported("GL_VERSION_3_3")) {
-    std::cerr << "Failed to initialize GLEW with OpenGL 3.3!" << std::endl;
-    glfwTerminate();
-    return EXIT_FAILURE;
-  }
-
-  // Add keyboard and mouse handlers
-  glfwSetKeyCallback(window, OnKeyPress);
-  glfwSetCursorPosCallback(window, OnMouseMove);
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN); // Hide mouse cursor
-  glfwSetInputMode(window, GLFW_STICKY_KEYS, 1);
-
-  // Initialize OpenGL state
-  // Enable Z-buffer
-  glEnable(GL_DEPTH_TEST);
-  glDepthFunc(GL_LEQUAL);
-
-  // Enable polygon culling
-  glEnable(GL_CULL_FACE);
-  glFrontFace(GL_CCW);
-  glCullFace(GL_BACK);
-
-  InitializeScene();
-
-  // Track time
-  float time = (float)glfwGetTime();
-
-  // Main execution loop
-  while (!glfwWindowShouldClose(window)) {
     // Compute time delta
     float dt = (float)glfwGetTime() - time;
     time = (float)glfwGetTime();
@@ -133,14 +102,15 @@ int main() {
     // Update and render all objects
     scene.Update(dt);
     scene.Render();
-
-    // Display result
-    glfwSwapBuffers(window);
-    glfwPollEvents();
   }
+};
 
-  // Clean up
-  glfwTerminate();
+int main() {
+  // Initialize our window
+  auto window = SceneWindow("gl_scene", SIZE, SIZE);
+
+  // Main execution loop
+  while (window.Pool()) {}
 
   return EXIT_SUCCESS;
 }

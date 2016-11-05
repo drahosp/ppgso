@@ -1,3 +1,5 @@
 .*
 _build*
 _install*
+result.rgb
+cmake-build-debug

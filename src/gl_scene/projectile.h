@@ -1,11 +1,19 @@
 #ifndef PPGSO_PROJECTILE_H
 #define PPGSO_PROJECTILE_H
 
-#include "shader.h"
-#include "mesh.h"
+#include <ppgso/ppgso.h>
+
 #include "object.h"
 
 class Projectile : public Object {
+private:
+  static std::shared_ptr<ppgso::Shader> shader;
+  static std::shared_ptr<ppgso::Mesh> mesh;
+  static std::shared_ptr<ppgso::Texture> texture;
+
+  float age = 0;
+  glm::vec3 speed;
+  glm::vec3 rotMomentum;
 public:
   Projectile();
   ~Projectile();
@@ -14,15 +22,6 @@ public:
   void Render(Scene &scene) override;
 
   void Destroy();
-private:
-  float age;
-  glm::vec3 speed;
-  glm::vec3 rotMomentum;
-
-  static ShaderPtr shader;
-  static MeshPtr mesh;
-  static TexturePtr texture;
 };
-typedef std::shared_ptr< Projectile > ProjectilePtr;
 
 #endif //PPGSO_PROJECTILE_H

@@ -1,11 +1,5 @@
 #include "scene.h"
 
-Scene::Scene() {
-}
-
-Scene::~Scene() {
-}
-
 void Scene::Update(float time) {
   camera->Update();
 
@@ -24,7 +18,6 @@ void Scene::Update(float time) {
 
 void Scene::Render() {
   // Simply render all objects
-  for (auto obj : objects )
+  for (auto& obj : objects )
     obj->Render(*this);
 }
-

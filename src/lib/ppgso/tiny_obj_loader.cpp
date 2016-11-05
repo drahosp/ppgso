@@ -172,7 +172,7 @@ static bool tryParseDouble(const char *s, const char *s_end, double *result) {
   // Read the integer part.
   while ((end_not_reached = (curr != s_end)) && isdigit(*curr)) {
     mantissa *= 10;
-    mantissa += static_cast<int>(*curr - 0x30);
+    mantissa += *curr - 0x30;
     curr++;
     read++;
   }
@@ -190,7 +190,7 @@ static bool tryParseDouble(const char *s, const char *s_end, double *result) {
     read = 1;
     while ((end_not_reached = (curr != s_end)) && isdigit(*curr)) {
       // NOTE: Don't use powf here, it will absolutely murder precision.
-      mantissa += static_cast<int>(*curr - 0x30) * pow(10.0, -read);
+      mantissa += (*curr - 0x30) * pow(10.0, -read);
       read++;
       curr++;
     }
@@ -218,7 +218,7 @@ static bool tryParseDouble(const char *s, const char *s_end, double *result) {
     read = 0;
     while ((end_not_reached = (curr != s_end)) && isdigit(*curr)) {
       exponent *= 10;
-      exponent += static_cast<int>(*curr - 0x30);
+      exponent += *curr - 0x30;
       curr++;
       read++;
     }
@@ -417,7 +417,7 @@ std::string LoadMtl(std::map<std::string, int> &material_map,
   InitMaterial(material);
 
   int maxchars = 8192;             // Alloc enough size.
-  std::vector<char> buf(maxchars); // Alloc enough size.
+  std::vector<char> buf((unsigned long) maxchars); // Alloc enough size.
   while (inStream.peek() != -1) {
     inStream.getline(&buf[0], maxchars);
 
@@ -469,7 +469,7 @@ std::string LoadMtl(std::map<std::string, int> &material_map,
 #else
       sscanf(token, "%s", namebuf);
 #endif
-      material.name = namebuf;
+      material.name = std::string(namebuf);
       continue;
     }
 
@@ -625,7 +625,7 @@ std::string LoadMtl(std::map<std::string, int> &material_map,
     }
     if (_space) {
       std::ptrdiff_t len = _space - token;
-      std::string key(token, len);
+      std::string key(token, (unsigned long) len);
       std::string value = _space + 1;
       material.unknown_parameter.insert(
           std::pair<std::string, std::string>(key, value));
@@ -703,7 +703,7 @@ std::string LoadObj(std::vector<shape_t> &shapes,
   shape_t shape;
 
   int maxchars = 8192;             // Alloc enough size.
-  std::vector<char> buf(maxchars); // Alloc enough size.
+  std::vector<char> buf((unsigned long) maxchars); // Alloc enough size.
   while (inStream.peek() != -1) {
     inStream.getline(&buf[0], maxchars);
 

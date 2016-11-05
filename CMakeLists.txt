@@ -14,8 +14,8 @@ set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/_install)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-# Add custom target for installation in CLion
 
+# Add custom target for installation in CLion
 add_custom_target(run_install COMMAND ${CMAKE_MAKE_PROGRAM} install)
 
 # Use generate_shader function to convert .glsl sources to C++ headers
@@ -32,7 +32,7 @@ if (MINGW)
 elseif (MSVC)
   set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "${CMAKE_SOURCE_DIR}/dependencies/include/")
   set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "${CMAKE_SOURCE_DIR}/dependencies/lib/vc2015")
-  set(STRICT_COMPILE_FLAGS)
+  set(USE_STRICT_COMPILE_WARNINGS OFF)
 endif ()
 
 # Warnings for Debug mode
@@ -56,10 +56,11 @@ endif ()
 
 # PPGSO library
 add_library(libppgso STATIC
-        src/lib/mesh.cpp
-        src/lib/tiny_obj_loader.cpp
-        src/lib/shader.cpp
-        src/lib/texture.cpp)
+        src/lib/ppgso/mesh.cpp
+        src/lib/ppgso/tiny_obj_loader.cpp
+        src/lib/ppgso/shader.cpp
+        src/lib/ppgso/texture.cpp
+        src/lib/ppgso/window.cpp)
 # Make sure GLM uses radians and static GLEW library
 target_compile_definitions(libppgso PUBLIC -DGLM_FORCE_RADIANS -DGLEW_STATIC )
 # Link to GLFW, GLEW and OpenGL
@@ -82,6 +83,7 @@ target_include_directories(libppgso PUBLIC
 set(RAW_GRADIENT_SRC
         src/raw_gradient/raw_gradient.cpp)
 add_executable(raw_gradient ${RAW_GRADIENT_SRC})
+target_link_libraries(raw_gradient libppgso)
 install(TARGETS raw_gradient DESTINATION .)
 
 # gl_gradient
@@ -137,6 +139,26 @@ generate_shaders(GL_MESH_SHADERS
 add_executable(gl_mesh ${GL_MESH_SRC} ${GL_MESH_SHADERS})
 target_link_libraries(gl_mesh libppgso)
 install(TARGETS gl_mesh DESTINATION .)
+
+# gl_framebuffer
+set(GL_FRAMEBUFFER_SRC src/gl_framebuffer/gl_framebuffer.cpp)
+generate_shaders(GL_FRAMEBUFFER_SHADERS
+        src/gl_framebuffer/gl_framebuffer_vert.glsl
+        src/gl_framebuffer/gl_framebuffer_frag.glsl
+        src/gl_framebuffer/gl_framebuffer_texture_vert.glsl
+        src/gl_framebuffer/gl_framebuffer_texture_frag.glsl)
+add_executable(gl_framebuffer ${GL_FRAMEBUFFER_SRC} ${GL_FRAMEBUFFER_SHADERS})
+target_link_libraries(gl_framebuffer libppgso)
+install(TARGETS gl_framebuffer DESTINATION .)
+
+# gl_diffuse
+set(GL_DIFFUSE_SRC src/gl_diffuse/gl_diffuse.cpp)
+generate_shaders(GL_DIFFUSE_SHADERS
+        src/gl_diffuse/gl_diffuse_vert.glsl
+        src/gl_diffuse/gl_diffuse_frag.glsl)
+add_executable(gl_diffuse ${GL_DIFFUSE_SRC} ${GL_DIFFUSE_SHADERS})
+target_link_libraries(gl_diffuse libppgso)
+install(TARGETS gl_diffuse DESTINATION .)
 
 # gl_scene
 set(GL_SCENE_SRC

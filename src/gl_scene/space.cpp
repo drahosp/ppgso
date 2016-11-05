@@ -4,15 +4,18 @@
 #include "space_vert.h"
 #include "space_frag.h"
 
+using namespace std;
+using namespace ppgso;
+
 Space::Space() {
   offset = 0;
   // Z of 1 means back as there is no perspective projection applied during render
   position.z = 1;
 
   // Initialize static resources if needed
-  if (!shader) shader = ShaderPtr(new Shader{space_vert, space_frag});
-  if (!texture) texture = TexturePtr(new Texture{"stars.rgb", 512, 512});
-  if (!mesh) mesh = MeshPtr(new Mesh{shader, "quad.obj"});
+  if (!shader) shader = make_shared<Shader>(space_vert, space_frag);
+  if (!texture) texture = make_shared<Texture>("stars.rgb", 512, 512);
+  if (!mesh) mesh = make_shared<Mesh>(shader, "quad.obj");
 }
 
 Space::~Space() {
@@ -39,7 +42,7 @@ void Space::Render(Scene &scene) {
   mesh->Render();
 }
 
-// Static resources
-MeshPtr Space::mesh;
-ShaderPtr Space::shader;
-TexturePtr Space::texture;
+// shared resources
+shared_ptr<Mesh> Space::mesh;
+shared_ptr<Shader> Space::shader;
+shared_ptr<Texture> Space::texture;

@@ -4,146 +4,122 @@
 // - Try to combilne multiple transformation using multiplication
 
 #include <iostream>
-#include <vector>
-#include <string>
-#include <fstream>
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+
+#include <ppgso/ppgso.h>
 
 #include <glm/mat3x3.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/matrix_transform_2d.hpp>
 
-#include "shader.h"
-#include "mesh.h"
 #include "gl_transform_vert.h"
 #include "gl_transform_frag.h"
 
+using namespace std;
+using namespace glm;
+using namespace ppgso;
+
 const unsigned int SIZE = 512;
 
-void SetTransformation(ShaderPtr program, float time) {
-  // Create transformation matrix
-  // NOTE: glm matrices are declared column major !
+class TransformWindow : public Window {
+private:
+  Shader program{gl_transform_vert, gl_transform_frag};
+  Texture texture{"lena.rgb", 512, 512};
+  Mesh quad{program, "quad.obj"};
 
-  // identity
-  auto transform = glm::mat3({
-     1.0, 0.0, 0.0,
-     0.0, 1.0, 0.0,
-     0.0, 0.0, 1.0
-  });
+  mat3 GetTransformation(float time) {
+    // Create transformation matrix
+    // NOTE: glm matrices are declared column major !
 
-  // scale
-  // transform *= glm::mat3({
-  //    std::sin(time), 0.0, 0.0,
-  //    0.0, std::sin(time), 0.0,
-  //    0.0, 0.0, 1.0
-  //  });
+    // identity
+    auto transform = mat3({
+                              1.0, 0.0, 0.0,
+                              0.0, 1.0, 0.0,
+                              0.0, 0.0, 1.0
+                          });
 
-  // squash
-  // transform *= glm::mat3({
-  //   std::sin(time), 0.0, 0.0,
-  //   0.0, std::cos(time), 0.0,
-  //   0.0, 0.0, 1.0
-  // });
+    // scale
+//   transform *= mat3({
+//      sin(time), 0.0, 0.0,
+//      0.0, sin(time), 0.0,
+//      0.0, 0.0, 1.0
+//    });
 
-  // rotate
-  transform *= glm::mat3({
-     std::cos(time), std::sin(time), 0.0,
-     -std::sin(time), std::cos(time), 0.0,
-     0.0, 0.0, 1.0
-  });
+    // squash
+//   transform *= mat3({
+//     sin(time), 0.0, 0.0,
+//     0.0, cos(time), 0.0,
+//     0.0, 0.0, 1.0
+//   });
 
-  // translate
-  // transform *= glm::mat3({
-  //    1.0, 0.0, 0.0,
-  //   0.0, 1.0, 0.0,
-  //   std::sin(time)/2.0, std::cos(time)/2.0, 1.0
-  // });
+    // rotate
+//    transform *= mat3({
+//      cos(time), sin(time), 0.0,
+//      -sin(time), cos(time), 0.0,
+//      0.0, 0.0, 1.0
+//    });
 
-  // Rotate around top right corner
-  // transform *= glm::mat3({
-  //   // Move to origin
-  //   1.0, 0.0, 0.0,
-  //   0.0, 1.0, 0.0,
-  //   1.0, 1.0, 1.0
-  // }) * glm::mat3({
-  //   // Rotate
-  //   std::cos(time), std::sin(time), 0.0,
-  //   -std::sin(time), std::cos(time), 0.0,
-  //   0.0, 0.0, 1.0
-  // }) * glm::mat3({
-  //   // Move back
-  //   1.0, 0.0, 0.0,
-  //   0.0, 1.0, 0.0,
-  //   -1.0, -1.0, 1.0
-  // });
+    // translate
+//   transform *= mat3({
+//      1.0, 0.0, 0.0,
+//     0.0, 1.0, 0.0,
+//     sin(time)/2.0, cos(time)/2.0, 1.0
+//   });
 
-  // Send matrix value to program
-  auto transform_uniform = program->GetUniformLocation("Transform");
-  glUniformMatrix3fv(transform_uniform, 1, GL_FALSE, glm::value_ptr(transform));
-}
+    // Rotate around top right corner
+//   transform *= mat3({
+//     // Move back
+//     1.0, 0.0, 0.0,
+//     0.0, 1.0, 0.0,
+//     1.0, 1.0, 1.0
+//   }) * mat3({
+//     // Rotate
+//     cos(time), sin(time), 0.0,
+//     -sin(time), cos(time), 0.0,
+//     0.0, 0.0, 1.0
+//   }) * mat3({
+//     // Move to origin
+//     1.0, 0.0, 0.0,
+//     0.0, 1.0, 0.0,
+//     -1.0, -1.0, 1.0
+//   });
 
-int main() {
-  // Initialize GLFW
-  if (!glfwInit()) {
-    std::cerr << "Failed to initialize GLFW!" << std::endl;
-    return EXIT_FAILURE;
+    // Rotate around top right corner using glm functions
+    auto rotation_point = vec2{1,1};
+    transform = translate(mat3{}, rotation_point) * rotate(mat3{}, time) * glm::translate(mat3{}, -rotation_point);
+
+    return transform;
   }
 
-  // Setup OpenGL context
-  glfwWindowHint(GLFW_SAMPLES, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-  // Try to create a window
-  auto window = glfwCreateWindow( SIZE, SIZE, "PPGSO gl_transform", nullptr, nullptr);
-  if (!window) {
-    std::cerr << "Failed to open GLFW window, your graphics card is probably only capable of OpenGL 2.1" << std::endl;
-    glfwTerminate();
-    return EXIT_FAILURE;
+public:
+  TransformWindow(string title, unsigned int width, unsigned int height) : Window{title, width, height} {
+    // Set program input for texture uniform
+    program.SetTexture(texture, "Texture");
   }
 
-  // Finalize window setup
-  glfwMakeContextCurrent(window);
-
-  // Initialize GLEW
-  glewExperimental = GL_TRUE;
-  glewInit();
-  if (!glewIsSupported("GL_VERSION_3_3")) {
-    std::cerr << "Failed to initialize GLEW with OpenGL 3.3!" << std::endl;
-    glfwTerminate();
-    return EXIT_FAILURE;
-  }
-
-  // Load shaders
-  auto program = ShaderPtr(new Shader{gl_transform_vert, gl_transform_frag});
-  program->Use();
-
-  auto texture = Texture{"lena.rgb", 512, 512};
-  auto quad = Mesh{program, "quad.obj"};
-
-  float time = 0;
-  // Main execution loop
-  while (!glfwWindowShouldClose(window)) {
+  void onPool() {
     // Set gray background
     glClearColor(.5f,.5f,.5f,0);
+
     // Clear depth and color buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    SetTransformation(program, time+=0.01f);
+    float time = (float) glfwGetTime();
 
-    program->SetMatrix(glm::mat4(1.0f), "ModelView");
+    // Generate and set the transformation matrix
+    program.SetMatrix(GetTransformation(time), "ModelView");
+
+    // Render geometry
     quad.Render();
-
-    // Display result
-    glfwSwapBuffers(window);
-    glfwPollEvents();
   }
+};
 
-  // Clean up
-  glfwTerminate();
+
+int main() {
+  // Create our window
+  auto window = TransformWindow{"gl_transform", SIZE, SIZE};
+
+  // Main execution loop
+  while (window.Pool()) {}
 
   return EXIT_SUCCESS;
 }
