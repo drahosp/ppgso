@@ -11,12 +11,6 @@ using namespace std;
 using namespace glm;
 using namespace ppgso;
 
-/*!
- * Compile and manage an GLSL program and its inputs.
- *
- * @param vertex_shader_code - String containing the source of the vertex shader.
- * @param fragment_shader_code - String containing the source of the fragment shader.
- */
 Shader::Shader(const string &vertex_shader_code, const string &fragment_shader_code) {
   // Create shaders
   auto vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
@@ -83,41 +77,20 @@ Shader::~Shader() {
   glDeleteProgram( program );
 }
 
-/*!
- * Bind the shader program for use.
- */
 void Shader::Use() {
   glUseProgram(program);
 }
 
-/*!
- * Get OpenGL attribute location for for the input specified by _name_
- *
- * @param name - Name of the shader program input variable.
- * @return - OpenGL attribute location number.
- */
 GLuint Shader::GetAttribLocation(const string &name) {
   Use();
   return (GLuint) glGetAttribLocation(program, name.c_str());
 }
 
-/*!
- * Get OpenGL uniform location for for the input specified by _name_
- *
- * @param name - Name of the shader program input variable.
- * @return - OpenGL attribute location number.
- */
 GLuint Shader::GetUniformLocation(const string &name) {
   Use();
   return (GLuint) glGetUniformLocation(program, name.c_str());
 }
 
-/*!
- * Set texture as an input for the shader program variable _name_
- *
- * @param texture - Texture to set input to.
- * @param name - Name of the shader program uniform input variable.
- */
 void Shader::SetTexture(const shared_ptr<Texture> &texture, const string &name) {
   Use();
   auto texture_id = texture->GetTexture();
@@ -127,12 +100,6 @@ void Shader::SetTexture(const shared_ptr<Texture> &texture, const string &name) 
   glBindTexture(GL_TEXTURE_2D, texture_id);
 }
 
-/*!
- * Set texture as an input for the shader program variable _name_
- *
- * @param texture - Texture to set input to.
- * @param name - Name of the shader program uniform input variable.
- */
 void Shader::SetTexture(Texture &texture, const string &name) {
   Use();
   auto texture_id = texture.GetTexture();
@@ -142,80 +109,38 @@ void Shader::SetTexture(Texture &texture, const string &name) {
   glBindTexture(GL_TEXTURE_2D, texture_id);
 }
 
-/*!
- * Set matrix as an input for the shader program variable _name_
- *
- * @param matrix - Matrix to set input to.
- * @param name - Name of the shader program uniform input variable.
- */
 void Shader::SetMatrix(mat4 matrix, const string &name) {
   Use();
   auto uniform = GetUniformLocation(name.c_str());
   glUniformMatrix4fv(uniform, 1, GL_FALSE, value_ptr(matrix));
 }
 
-/*!
- * Set matrix as an input for the shader program variable _name_
- *
- * @param matrix - Matrix to set input to.
- * @param name - Name of the shader program uniform input variable.
- */
 void Shader::SetMatrix(mat3 matrix, const string &name) {
   Use();
   auto uniform = GetUniformLocation(name.c_str());
   glUniformMatrix3fv(uniform, 1, GL_FALSE, value_ptr(matrix));
 }
 
-/*!
- * Set a floating point value as an input for the shader program variable _name_
- *
- * @param value - Value to set input to.
- * @param name - Name of the shader program uniform input variable.
- */
 void Shader::SetFloat(float value, const string &name) {
   Use();
   auto uniform = GetUniformLocation(name.c_str());
   glUniform1f(uniform, value);
 }
 
-/*!
- * Get OpenGL program identifier number.
- *
- * @return - OpenGL program identifer number.
- */
 GLuint Shader::GetProgram() { return program; }
 
-
-/*!
- * Set a vector as an input for the shader program variable _name_
- *
- * @param vector - Vector to set input to.
- * @param name - Name of the shader program uniform input variable.
- */
 void Shader::SetVector(vec2 vector, const string &name) {
   Use();
   auto uniform = GetUniformLocation(name.c_str());
   glUniform2fv(uniform, 1, value_ptr(vector));
 }
 
-/*!
- * Set a vector as an input for the shader program variable _name_
- *
- * @param vector - Vector to set input to.
- * @param name - Name of the shader program uniform input variable.
- */
 void Shader::SetVector(vec3 vector, const string &name) {
   Use();
   auto uniform = GetUniformLocation(name.c_str());
   glUniform3fv(uniform, 1, value_ptr(vector));
 }
 
-/*!
- * Set a vector as an input for the shader program variable _name_
- *
- * @param vector - Vector to set input to.
- * @param name - Name of the shader program uniform input variable.
- */
 void Shader::SetVector(vec4 vector, const string &name) {
   Use();
   auto uniform = GetUniformLocation(name.c_str());

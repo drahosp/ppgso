@@ -1,6 +1,6 @@
 // Task 2 - Implement Bresenham drawing alg.
 //        - Draw a star using lines
-//        - Save as result.rgb
+//        - Save as result.raw
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -61,9 +61,9 @@ int main()
   for(unsigned int i = 0; i < points.size() - 1; i++)
     drawLine(points[i], points[i+1]);
 
-  // - Save as result.rgb, alternatively use fopen/fwrite etc.
-  cout << "Generating result.rgb file ..." << endl;
-  ofstream raw("result.rgb", ios::binary);
+  // - Save as result.raw, alternatively use fopen/fwrite etc.
+  cout << "Generating result.raw file ..." << endl;
+  ofstream raw("result.raw", ios::binary);
   raw.write(reinterpret_cast<char*>(framebuffer), sizeof(Pixel) * SIZE * SIZE);
   raw.close();
 

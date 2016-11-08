@@ -21,7 +21,7 @@ const unsigned int SIZE = 512;
 // Object to represent 2D shape
 class Shape {
 private:
-  // 2D vectors define points/vetrices of the shape
+  // 2D vectors define points/vertices of the shape
   vector<vec2> vetrices = {
       {-.3, 1},
       {.3,  1},
@@ -40,7 +40,7 @@ private:
   };
 
   // Program to associate with the object
-  Shader program{task5_2dshapes_vert, task5_2dshapes_frag};
+  Shader program = {task5_2dshapes_vert, task5_2dshapes_frag};
 
   // These will hold the data and object buffers
   GLuint vao, vbo, ibo;
@@ -82,7 +82,7 @@ public:
     glDeleteVertexArrays(1, &vao);
   }
 
-  // Set the object transformation matric
+  // Set the object transformation matrix
   void Update() {
     // Compute transformation by scaling, rotating and then translating the shape
     model_matrix = glm::translate(mat3{}, position)
@@ -106,12 +106,12 @@ class ShapeWindow : public Window {
 private:
   Shape shape1, shape2;
 public:
-  ShapeWindow(string title, unsigned int width, unsigned int height) : Window{title, width, height} {
+  ShapeWindow() : Window{"task5_2dshapes", SIZE, SIZE} {
     shape1.color = {1,0,0};
     shape2.color = {0,1,0};
   }
 
-  void onPool() {
+  void onIdle() {
     // Set gray background
     glClearColor(.1f,.1f,.1f,1.0f);
     // Clear depth and color buffers
@@ -141,7 +141,7 @@ public:
 
 int main() {
   // Create our window
-  auto window = ShapeWindow{"task5_2dshapes", SIZE, SIZE};
+  auto window = ShapeWindow{};
 
   // Main execution loop
   while (window.Pool()) {}

@@ -1,6 +1,6 @@
 // Task 1 - Load a 512x512 image
 //        - Invert colors
-//        - Save as result.rgb
+//        - Save as result.raw
 #include <fstream>
 #include <iostream>
 #include <array>
@@ -24,9 +24,9 @@ int main()
   auto framebuffer = new Pixel[SIZE][SIZE];
 
   // - Load a 512x512 image
-  auto file = fopen("lena.rgb", "rb");
+  auto file = fopen("lena.raw", "rb");
   if (!file) {
-    cout << "Cannot load lena.rgb." << endl;
+    cout << "Cannot load lena.raw." << endl;
     delete[] framebuffer;
     return EXIT_FAILURE;
   }
@@ -36,15 +36,15 @@ int main()
   // - Invert colors
   for (unsigned int y = 0; y < SIZE; y++) {
     for (unsigned int x = 0; x < SIZE; x++) {
-      framebuffer[x][y].r = 255 - framebuffer[x][y].r;
-      framebuffer[x][y].g = 255 - framebuffer[x][y].g;
-      framebuffer[x][y].b = 255 - framebuffer[x][y].b;
+      framebuffer[x][y].r = (unsigned char)(255 - framebuffer[x][y].r);
+      framebuffer[x][y].g = (unsigned char)(255 - framebuffer[x][y].g);
+      framebuffer[x][y].b = (unsigned char)(255 - framebuffer[x][y].b);
     }
   }
 
   // - Save as result.rgb, alternatively use fopen/fwrite etc.
-  cout << "Generating result.rgb file ..." << endl;
-  ofstream raw("result.rgb", ios::binary);
+  cout << "Generating result.raw file ..." << endl;
+  ofstream raw("result.raw", ios::binary);
   raw.write(reinterpret_cast<char*>(framebuffer), sizeof(Pixel) * SIZE * SIZE);
   raw.close();
 

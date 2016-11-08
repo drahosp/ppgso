@@ -10,6 +10,7 @@
 namespace ppgso {
   class Window {
   private:
+    // Singleton classes to wrap glew and glfw initialization
     class glfwInstance {
     protected:
       glfwInstance();
@@ -25,10 +26,10 @@ namespace ppgso {
       static glewInstance &Init();
     };
 
-    // Collection of windows
+    // Map of windows and associated glfw windows for event propagation
     static std::map<GLFWwindow*, Window*> windows;
 
-    // Callbacks
+    // Static callback functions for glfw
     static void glfw_error_callback(int error, const char *description);
     static void glfw_key_callback(GLFWwindow *window, int key, int scanCode, int action, int mods);
     static void glfw_cursor_pos_callback(GLFWwindow *window, double cursorX, double cursorY);
@@ -43,7 +44,7 @@ namespace ppgso {
 
     virtual ~Window();
 
-    virtual void onPool() {}
+    virtual void onIdle() {}
     virtual void onKey(int key, int scanCode, int action, int mods) {};
     virtual void onCursorPos(double cursorX, double cursorY) {};
 

@@ -2,8 +2,6 @@
 //        - Define a 5x5 filter
 
 #include <iostream>
-#include <vector>
-#include <fstream>
 
 #include <ppgso/ppgso.h>
 
@@ -17,17 +15,17 @@ const unsigned int SIZE = 512;
 
 class ConvolutionWindow : public Window {
 private:
-  Shader program{task4_convolution_vert, task4_convolution_frag};
-  Mesh quad{program, "quad.obj"};
-  Texture texture{"lena.rgb", SIZE, SIZE};
+  Shader program = {task4_convolution_vert, task4_convolution_frag};
+  Mesh quad = {program, "quad.obj"};
+  Texture texture = {"lena.bmp"};
 
 public:
-  ConvolutionWindow(string title, unsigned int width, unsigned int height) : Window{title, width, height} {
+  ConvolutionWindow() : Window{"task4_convolution", SIZE, SIZE} {
     // Set program input for texture uniform
     program.SetTexture(texture, "Texture");
   }
 
-  void onPool() {
+  void onIdle() {
     // Set gray background
     glClearColor(.5f, .5f, .5f, 0);
     // Clear depth and color buffers
@@ -40,7 +38,7 @@ public:
 
 int main() {
   // Create our window
-  auto window = ConvolutionWindow{"task4_convolution", SIZE, SIZE};
+  auto window = ConvolutionWindow{};
 
   // Main execution loop
   while (window.Pool()) {}

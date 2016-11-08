@@ -1,7 +1,7 @@
 //
 // Copyright 2012-2015, Syoyo Fujita.
 //
-// Licensed under 2-clause BSD liecense.
+// Licensed under 2-clause BSD license.
 //
 
 //
@@ -21,7 +21,7 @@
 // version 0.9.5 : Parse multiple group name.
 //                 Add support of specifying the base path to load material
 //                 file.
-// version 0.9.4 : Initial suupport of group tag(g)
+// version 0.9.4 : Initial support of group tag(g)
 // version 0.9.3 : Fix parsing triple 'x/y/z'
 // version 0.9.2 : Add more .mtl load support
 // version 0.9.1 : Add initial .mtl load support
@@ -376,7 +376,7 @@ static bool exportFaceGroupToShape(
 
     size_t npolys = face.size();
 
-    // Polygon -> triangle fan conversion
+    // Polygon -> face fan conversion
     for (size_t k = 2; k < npolys; k++) {
       i1 = i2;
       i2 = face[k];

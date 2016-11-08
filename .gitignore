@@ -1,5 +1,5 @@
 .*
 _build*
 _install*
-result.rgb
+result.raw
 cmake-build-debug

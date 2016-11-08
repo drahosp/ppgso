@@ -7,32 +7,10 @@ using namespace std;
 using namespace glm;
 using namespace ppgso;
 
-/*!
- * Load 3D geometry from a na Wavefront .obj file.
- *
- * The shader program passed to the object will be bound to the geometry as follows:
- * vec3 Position - Vertex position
- * vec2 TexCoord - Texture coordinate
- * vec3 Normal - Normal vector
- *
- * @param program - Shader program to associate the loaded geometry with.
- * @param obj - File path to the obj file to load.
- */
 Mesh::Mesh(shared_ptr<Shader> &program, const string &obj_file) : program{*program.get()} {
   initGeometry(obj_file);
 }
 
-/*!
- * Load 3D geometry from a na Wavefront .obj file.
- *
- * The shader program passed to the object will be bound to the geometry as follows:
- * vec3 Position - Vertex position
- * vec2 TexCoord - Texture coordinate
- * vec3 Normal - Normal vector
- *
- * @param program - Shader program to associate the loaded geometry with.
- * @param obj - File path to the obj file to load.
- */
 Mesh::Mesh(Shader &program, const string &obj_file) : program{program} {
   initGeometry(obj_file);
 }
@@ -89,8 +67,7 @@ void Mesh::initGeometry(const string &obj_file) {
     glEnableVertexAttribArray(texcoord_attrib);
     glVertexAttribPointer(texcoord_attrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
   } else {
-    cout << "Warning: OBJ file " << obj_file
-              << " has no texture coordinates!" << endl;
+    cout << "Warning: OBJ file " << obj_file << " has no texture coordinates!" << endl;
   }
 
   // --- Normals ---
@@ -110,8 +87,7 @@ void Mesh::initGeometry(const string &obj_file) {
     glEnableVertexAttribArray(normal_attib);
     glVertexAttribPointer(normal_attib, 3, GL_FLOAT, GL_FALSE, 0, 0);
   } else {
-    cout << "Warning: OBJ file " << obj_file
-    << " has no normals!" << endl;
+    cout << "Warning: OBJ file " << obj_file << " has no normals!" << endl;
   }
 
   // --- Indices (define which triangles consists of which vertices) ---
@@ -127,9 +103,6 @@ void Mesh::initGeometry(const string &obj_file) {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_data.size() * sizeof(GLuint), index_data.data(), GL_STATIC_DRAW);
 }
 
-/*!
- * Render the geometry associated with the mesh using glDrawElements.
- */
 void Mesh::Render() {
   // Draw object
   glBindVertexArray(vao);

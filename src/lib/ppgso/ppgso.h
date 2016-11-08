@@ -7,6 +7,9 @@
 #include "texture.h"
 
 namespace ppgso {
+  /*!
+   * PI constant as defined in glm for float.
+   */
   const float PI = glm::pi<float>();
 }
 

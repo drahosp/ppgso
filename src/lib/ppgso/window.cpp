@@ -7,7 +7,7 @@ using namespace std;
 using namespace ppgso;
 
 int Window::Pool() {
-  onPool();
+  onIdle();
   glfwSwapBuffers(window);
   glfwPollEvents();
   return !glfwWindowShouldClose(window);
@@ -51,7 +51,7 @@ Window::~Window() {
 
 void Window::glfw_key_callback(GLFWwindow *window, int key, int scanCode, int action, int mods) {
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-    glfwSetWindowShouldClose(window, GLFW_TRUE);
+    glfwSetWindowShouldClose(window, true);
 
   windows[window]->onKey(key, scanCode, action, mods);
 }

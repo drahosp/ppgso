@@ -1,4 +1,4 @@
-#version 330
+#version 150
 // A texture is expected as program attribute
 uniform sampler2D Texture;
 
@@ -29,6 +29,5 @@ void main(void)
       color += kernelGauss[index++] * texture(Texture, FragTexCoord + shift);
     }
   }
-
   FragmentColor = color / factor + vec4(bias, bias, bias, 1);
 }

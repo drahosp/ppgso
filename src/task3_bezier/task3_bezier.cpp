@@ -4,7 +4,6 @@
 
 #include <iostream>
 #include <vector>
-#include <array>
 
 #include <ppgso/ppgso.h>
 
@@ -29,7 +28,7 @@ private:
   // First curve is 4 control points
   // Rest of the curves are 3 control points, each reusing the last curve end
   // Defines the letter "R"
-  vector<vec2> cpoints{
+  vector<vec2> controlPoints = {
       {0, -1},
       {0, -.3},
       {0, .3},
@@ -49,7 +48,7 @@ private:
   vector<vec2> points;
 
   // GLSL Program to use for rendering
-  Shader program{task3_bezier_vert, task3_bezier_frag};
+  Shader program = {task3_bezier_vert, task3_bezier_frag};
 
   // These numbers are used to pass buffer data to OpenGL
   GLuint vao, vbo, cvao, cvbo;
@@ -61,7 +60,7 @@ private:
 
     // Generate points
     for(int i = 0; i < count; i++) {
-      float t = (float)i/(count-1);
+      float t = (float)i/(float)(count-1);
       auto a = lerp(p0, p1, t);
       auto b = lerp(p1, p2, t);
       auto c = lerp(p2, p3, t);
@@ -74,14 +73,14 @@ private:
 
   // Compute points for a sequence of Bezier curves defined by a vector of control points
   // Each bezier curve will reuse the end point of the previous curve
-  void Bezier(vector<vec2> &points, const vector<vec2> &cpoints, int count) {
-    for(int i = 1; i < (int) cpoints.size(); i+=3)
-      BezierCurve(points, cpoints[i - 1], cpoints[i], cpoints[i + 1], cpoints[i + 2], count);
+  void Bezier(vector<vec2> &points, const vector<vec2> &controlPoints, int count) {
+    for(int i = 1; i < (int) controlPoints.size(); i+=3)
+      BezierCurve(points, controlPoints[i - 1], controlPoints[i], controlPoints[i + 1], controlPoints[i + 2], count);
   }
 public:
-  BezierWindow(string title, unsigned int width, unsigned int height) : Window{title, width, height} {
+  BezierWindow() : Window{"task3_bezier", SIZE, SIZE} {
     // Generate Bezier curve points
-    Bezier(points, cpoints, 15);
+    Bezier(points, controlPoints, 15);
 
     // Generate a vertex array object
     // This keeps track of what attributes are associated with buffers
@@ -106,7 +105,7 @@ public:
     // Generate a vertex buffer object, this will feed data to the vertex shader
     glGenBuffers(1, &cvbo);
     glBindBuffer(GL_ARRAY_BUFFER, cvbo);
-    glBufferData(GL_ARRAY_BUFFER, cpoints.size() * sizeof(vec2), cpoints.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, controlPoints.size() * sizeof(vec2), controlPoints.data(), GL_STATIC_DRAW);
 
     // Setup vertex array lookup, this tells the shader how to pick data for the "position" input
     auto cposition_attrib = program.GetAttribLocation("position");
@@ -121,7 +120,7 @@ public:
     glDeleteVertexArrays(1, &vao);
   }
 
-  void onPool() {
+  void onIdle() {
     // Set gray background
     glClearColor(0,0,0,0);
 
@@ -136,8 +135,8 @@ public:
 
     glBindVertexArray(cvao);
     program.SetVector(vec3{1,0,0}, "color");
-    glDrawArrays(GL_POINTS, 0, (GLsizei) cpoints.size());
-    glDrawArrays(GL_LINE_STRIP, 0, (GLsizei) cpoints.size());
+    glDrawArrays(GL_POINTS, 0, (GLsizei) controlPoints.size());
+    glDrawArrays(GL_LINE_STRIP, 0, (GLsizei) controlPoints.size());
 
     // Draw lines using the program
     glLineWidth(10.0);
@@ -150,7 +149,7 @@ public:
 
 int main() {
   // Create our window
-  auto window = BezierWindow("tast3_bezier", SIZE, SIZE);
+  auto window = BezierWindow();
 
   // Main execution loop
   while (window.Pool()) {}
