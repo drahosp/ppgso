@@ -2,17 +2,17 @@
 #include "scene.h"
 #include "explosion.h"
 
-#include "explosion_vert.h"
-#include "explosion_frag.h"
+#include <shaders/texture_vert_glsl.h>
+#include <shaders/texture_frag_glsl.h>
 
 using namespace std;
 using namespace glm;
 using namespace ppgso;
 
 // static resources
-shared_ptr<Mesh> Explosion::mesh;
-shared_ptr<Texture> Explosion::texture;
-shared_ptr<Shader> Explosion::shader;
+unique_ptr<Mesh> Explosion::mesh;
+unique_ptr<Texture> Explosion::texture;
+unique_ptr<Shader> Explosion::shader;
 
 Explosion::Explosion() {
   // Random rotation and momentum
@@ -21,27 +21,24 @@ Explosion::Explosion() {
   speed = {0.0f, 0.0f, 0.0f};
 
   // Initialize static resources if needed
-  if (!shader) shader = make_shared<Shader>(explosion_vert, explosion_frag);
-  if (!texture) texture = make_shared<Texture>("explosion.bmp");
-  if (!mesh) mesh = make_shared<Mesh>(shader, "asteroid.obj");
+  if (!shader) shader = make_unique<Shader>(texture_vert_glsl, texture_frag_glsl);
+  if (!texture) texture = make_unique<Texture>(image::loadBMP("explosion.bmp"));
+  if (!mesh) mesh = make_unique<Mesh>("asteroid.obj");
 }
 
-Explosion::~Explosion() {
-}
-
-void Explosion::Render(Scene &scene) {
-  shader->Use();
+void Explosion::render(Scene &scene) {
+  shader->use();
 
   // Transparency, interpolate from 1.0f -> 0.0f
-  shader->SetFloat(1.0f-age/maxAge, "Transparency");
+  shader->setUniform("Transparency", 1.0f - age / maxAge);
 
   // use camera
-  shader->SetMatrix(scene.camera->projectionMatrix, "ProjectionMatrix");
-  shader->SetMatrix(scene.camera->viewMatrix, "ViewMatrix");
+  shader->setUniform("ProjectionMatrix", scene.camera->projectionMatrix);
+  shader->setUniform("ViewMatrix", scene.camera->viewMatrix);
 
   // render mesh
-  shader->SetMatrix(modelMatrix, "ModelMatrix");
-  shader->SetTexture(texture, "Texture");
+  shader->setUniform("ModelMatrix", modelMatrix);
+  shader->setUniform("Texture", *texture);
 
   // Disable depth testing
   glDisable(GL_DEPTH_TEST);
@@ -51,7 +48,7 @@ void Explosion::Render(Scene &scene) {
   // Additive blending
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-  mesh->Render();
+  mesh->render();
 
   // Disable blending
   glDisable(GL_BLEND);
@@ -59,7 +56,7 @@ void Explosion::Render(Scene &scene) {
   glEnable(GL_DEPTH_TEST);
 }
 
-bool Explosion::Update(Scene &scene, float dt) {
+bool Explosion::update(Scene &scene, float dt) {
   // Update scale and rotation
   scale = scale * ( 1.0f + dt * 5.0f);
   rotation += rotMomentum * dt;
@@ -69,6 +66,6 @@ bool Explosion::Update(Scene &scene, float dt) {
   age += dt;
   if (age > maxAge) return false;
 
-  GenerateModelMatrix();
+  generateModelMatrix();
   return true;
 }

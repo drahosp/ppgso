@@ -1,48 +1,49 @@
 #include "space.h"
 #include "scene.h"
 
-#include "space_vert.h"
-#include "space_frag.h"
+#include <shaders/texture_vert_glsl.h>
+#include <shaders/texture_frag_glsl.h>
 
 using namespace std;
+using namespace glm;
 using namespace ppgso;
 
 Space::Space() {
-  offset = 0;
-  // Z of 1 means back as there is no perspective projection applied during render
-  position.z = 1;
-
   // Initialize static resources if needed
-  if (!shader) shader = make_shared<Shader>(space_vert, space_frag);
-  if (!texture) texture = make_shared<Texture>("stars.bmp");
-  if (!mesh) mesh = make_shared<Mesh>(shader, "quad.obj");
+  if (!shader) shader = make_unique<Shader>(texture_vert_glsl, texture_frag_glsl);
+  if (!texture) texture = make_unique<Texture>(image::loadBMP("stars.bmp"));
+  if (!mesh) mesh = make_unique<Mesh>("quad.obj");
 }
 
-Space::~Space() {
-}
-
-bool Space::Update(Scene &scene, float dt) {
+bool Space::update(Scene &scene, float dt) {
   // Offset for UV mapping, creates illusion of scrolling
-  offset -= dt/5;
+  textureOffset.y -= dt/5;
 
-  GenerateModelMatrix();
+  generateModelMatrix();
   return true;
 }
 
-void Space::Render(Scene &scene) {
+void Space::render(Scene &scene) {
+  // Disable writing to the depth buffer so we render a "background"
+  glDepthMask(GL_FALSE);
+
   // NOTE: this object does not use camera, just renders the entire quad as is
-  shader->Use();
+  shader->use();
 
   // Pass UV mapping offset to the shader
-  shader->SetFloat(offset, "Offset");
+  shader->setUniform("TextureOffset", textureOffset);
 
-  // Render mesh
-  shader->SetMatrix(modelMatrix, "ModelMatrix");
-  shader->SetTexture(texture, "Texture");
-  mesh->Render();
+  // Render mesh, not using any projections, we just render in 2D
+  shader->setUniform("ModelMatrix", modelMatrix);
+  shader->setUniform("ViewMatrix", mat4{});
+  shader->setUniform("ProjectionMatrix", mat4{});
+  shader->setUniform("Texture", *texture);
+  mesh->render();
+
+  glDepthMask(GL_TRUE);
 }
 
 // shared resources
-shared_ptr<Mesh> Space::mesh;
-shared_ptr<Shader> Space::shader;
-shared_ptr<Texture> Space::texture;
+unique_ptr<Mesh> Space::mesh;
+unique_ptr<Shader> Space::shader;
+unique_ptr<Texture> Space::texture;

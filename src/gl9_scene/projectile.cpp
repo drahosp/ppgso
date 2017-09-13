@@ -2,39 +2,36 @@
 #include "scene.h"
 #include "projectile.h"
 
-#include "object_vert.h"
-#include "object_frag.h"
+#include <shaders/diffuse_vert_glsl.h>
+#include <shaders/diffuse_frag_glsl.h>
 
 using namespace std;
 using namespace glm;
 using namespace ppgso;
 
 // shared resources
-shared_ptr<Mesh> Projectile::mesh;
-shared_ptr<Shader> Projectile::shader;
-shared_ptr<Texture> Projectile::texture;
+unique_ptr<Mesh> Projectile::mesh;
+unique_ptr<Shader> Projectile::shader;
+unique_ptr<Texture> Projectile::texture;
 
 Projectile::Projectile() {
   // Set default speed
   speed = {0.0f, 3.0f, 0.0f};
-  rotMomentum = {0.0f, 0.0f, (float)linearRand(-PI/4.0f, PI/4.0f)};
+  rotMomentum = {0.0f, 0.0f, linearRand(-PI/4.0f, PI/4.0f)};
 
   // Initialize static resources if needed
-  if (!shader) shader = make_shared<Shader>(object_vert, object_frag);
-  if (!texture) texture = make_shared<Texture>("missile.bmp");
-  if (!mesh) mesh = make_shared<Mesh>(shader, "missile.obj");
+  if (!shader) shader = make_unique<Shader>(diffuse_vert_glsl, diffuse_frag_glsl);
+  if (!texture) texture = make_unique<Texture>(image::loadBMP("missile.bmp"));
+  if (!mesh) mesh = make_unique<Mesh>("missile.obj");
 }
 
-Projectile::~Projectile() {
-}
-
-bool Projectile::Update(Scene &scene, float dt) {
+bool Projectile::update(Scene &scene, float dt) {
   // Increase age
   age += dt;
 
   // Accelerate
   speed += vec3{0.0f, 20.0f, 0.0f} * dt;
-  rotation += rotMomentum;
+  rotation += rotMomentum * dt;
 
   // Move the projectile
   position += speed * dt;
@@ -42,24 +39,27 @@ bool Projectile::Update(Scene &scene, float dt) {
   // Die after 5s
   if (age > 5.0f) return false;
 
-  GenerateModelMatrix();
+  generateModelMatrix();
   return true;
 }
 
-void Projectile::Render(Scene &scene) {
-  shader->Use();
+void Projectile::render(Scene &scene) {
+  shader->use();
+
+  // Set up light
+  shader->setUniform("LightDirection", scene.lightDirection);
 
   // use camera
-  shader->SetMatrix(scene.camera->projectionMatrix, "ProjectionMatrix");
-  shader->SetMatrix(scene.camera->viewMatrix, "ViewMatrix");
+  shader->setUniform("ProjectionMatrix", scene.camera->projectionMatrix);
+  shader->setUniform("ViewMatrix", scene.camera->viewMatrix);
 
   // render mesh
-  shader->SetMatrix(modelMatrix, "ModelMatrix");
-  shader->SetTexture(texture, "Texture");
-  mesh->Render();
+  shader->setUniform("ModelMatrix", modelMatrix);
+  shader->setUniform("Texture", *texture);
+  mesh->render();
 }
 
-void Projectile::Destroy() {
+void Projectile::destroy() {
   // This will destroy the projectile on Update
   age = 100.0f;
 }

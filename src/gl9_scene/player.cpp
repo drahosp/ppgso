@@ -4,60 +4,48 @@
 #include "projectile.h"
 #include "explosion.h"
 
-#include "object_frag.h"
-#include "object_vert.h"
-
-#include <GLFW/glfw3.h>
+#include <shaders/diffuse_vert_glsl.h>
+#include <shaders/diffuse_frag_glsl.h>
 
 using namespace std;
 using namespace glm;
 using namespace ppgso;
 
 // shared resources
-shared_ptr<Mesh> Player::mesh;
-shared_ptr<Texture> Player::texture;
-shared_ptr<Shader> Player::shader;
+unique_ptr<Mesh> Player::mesh;
+unique_ptr<Texture> Player::texture;
+unique_ptr<Shader> Player::shader;
 
 Player::Player() {
-  // Reset fire delay
-  fireDelay = 0;
-  // Set the rate of fire
-  fireRate = 0.3f;
-  // Fire offset;
-  fireOffset = {0.7f,0.0f,0.0f};
-
   // Scale the default model
   scale *= 3.0f;
 
   // Initialize static resources if needed
-  if (!shader) shader = make_shared<Shader>(object_vert, object_frag);
-  if (!texture) texture = make_shared<Texture>("corsair.bmp");
-  if (!mesh) mesh = make_shared<Mesh>(shader, "corsair.obj");
+  if (!shader) shader = make_unique<Shader>(diffuse_vert_glsl, diffuse_frag_glsl);
+  if (!texture) texture = make_unique<Texture>(image::loadBMP("corsair.bmp"));
+  if (!mesh) mesh = make_unique<Mesh>("corsair.obj");
 }
 
-Player::~Player() {
-}
-
-bool Player::Update(Scene &scene, float dt) {
+bool Player::update(Scene &scene, float dt) {
   // Fire delay increment
   fireDelay += dt;
 
   // Hit detection
-  for ( auto obj : scene.objects ) {
+  for ( auto& obj : scene.objects ) {
     // Ignore self in scene
     if (obj.get() == this)
       continue;
 
     // We only need to collide with asteroids, ignore other objects
-    auto asteroid = std::dynamic_pointer_cast<Asteroid>(obj);
+    auto asteroid = dynamic_cast<Asteroid*>(obj.get());
     if (!asteroid) continue;
 
-    if (glm::distance(position, asteroid->position) < asteroid->scale.y) {
+    if (distance(position, asteroid->position) < asteroid->scale.y) {
       // Explode
-      auto explosion = make_shared<Explosion>();
+      auto explosion = make_unique<Explosion>();
       explosion->position = position;
       explosion->scale = scale * 3.0f;
-      scene.objects.push_back(explosion);
+      scene.objects.push_back(move(explosion));
 
       // Die
       return false;
@@ -82,24 +70,27 @@ bool Player::Update(Scene &scene, float dt) {
     // Invert file offset
     fireOffset = -fireOffset;
 
-    auto projectile = make_shared<Projectile>();
+    auto projectile = make_unique<Projectile>();
     projectile->position = position + glm::vec3(0.0f, 0.0f, 0.3f) + fireOffset;
-    scene.objects.push_back(projectile);
+    scene.objects.push_back(move(projectile));
   }
 
-  GenerateModelMatrix();
+  generateModelMatrix();
   return true;
 }
 
-void Player::Render(Scene &scene) {
-  shader->Use();
+void Player::render(Scene &scene) {
+  shader->use();
+
+  // Set up light
+  shader->setUniform("LightDirection", scene.lightDirection);
 
   // use camera
-  shader->SetMatrix(scene.camera->projectionMatrix, "ProjectionMatrix");
-  shader->SetMatrix(scene.camera->viewMatrix, "ViewMatrix");
+  shader->setUniform("ProjectionMatrix", scene.camera->projectionMatrix);
+  shader->setUniform("ViewMatrix", scene.camera->viewMatrix);
 
   // render mesh
-  shader->SetMatrix(modelMatrix, "ModelMatrix");
-  shader->SetTexture(texture, "Texture");
-  mesh->Render();
+  shader->setUniform("ModelMatrix", modelMatrix);
+  shader->setUniform("Texture", *texture);
+  mesh->render();
 }

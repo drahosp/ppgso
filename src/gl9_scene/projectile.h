@@ -1,27 +1,43 @@
-#ifndef PPGSO_PROJECTILE_H
-#define PPGSO_PROJECTILE_H
-
+#pragma once
 #include <ppgso/ppgso.h>
 
 #include "object.h"
 
-class Projectile : public Object {
+/*!
+ * Object representing a rocket projectile that will accelerate from the ship one created
+ */
+class Projectile final : public Object {
 private:
-  static std::shared_ptr<ppgso::Shader> shader;
-  static std::shared_ptr<ppgso::Mesh> mesh;
-  static std::shared_ptr<ppgso::Texture> texture;
+  static std::unique_ptr<ppgso::Shader> shader;
+  static std::unique_ptr<ppgso::Mesh> mesh;
+  static std::unique_ptr<ppgso::Texture> texture;
 
-  float age = 0;
+  float age{0.0f};
   glm::vec3 speed;
   glm::vec3 rotMomentum;
 public:
+  /*
+   * Create new projectile
+   */
   Projectile();
-  ~Projectile();
 
-  bool Update(Scene &scene, float dt) override;
-  void Render(Scene &scene) override;
+  /*!
+   * Update projectile position
+   * @param scene Scene to update
+   * @param dt Time delta
+   * @return true to delete the object
+   */
+  bool update(Scene &scene, float dt) override;
 
-  void Destroy();
+  /*!
+   * Render projectile
+   * @param scene Scene to render in
+   */
+  void render(Scene &scene) override;
+
+  /*!
+   * Destroy the projectile
+   */
+  void destroy();
 };
 
-#endif //PPGSO_PROJECTILE_H

@@ -12,6 +12,6 @@ Camera::Camera(float fow, float ratio, float near, float far) {
   projectionMatrix = perspective(fowInRad, ratio, near, far);
 }
 
-void Camera::Update() {
+void Camera::update() {
   viewMatrix = lookAt(position, position-back, up);
 }

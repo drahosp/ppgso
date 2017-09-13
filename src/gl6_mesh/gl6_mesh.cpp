@@ -1,14 +1,14 @@
 // Example gl6_mesh
-// - Displays geometry that is loaded from OBJ files encapsulated in a mesh object
-// - Demonstrates basic use of keyboard events (press A to start/stop animation) using inheritance from ppgso::Window
+// - Displays geometry that is loaded from Wavefront OBJ files encapsulated in a mesh object
 // - Implements object transformation based on mouse movement
 // - Combines parallel and orthographic camera projection
+// - SPACE stops/resumes the animation
 
 #include <glm/glm.hpp>
 #include <ppgso/ppgso.h>
 
-#include "gl6_mesh_frag.h"
-#include "gl6_mesh_vert.h"
+#include <shaders/texture_vert_glsl.h>
+#include <shaders/texture_frag_glsl.h>
 
 using namespace std;
 using namespace glm;
@@ -16,25 +16,32 @@ using namespace ppgso;
 
 const unsigned int SIZE = 512;
 
-// Our custom application
+/*!
+ * Custom window for displaying multiple meshes projections
+ */
 class MeshWindow : public Window {
 private:
-  Shader program = {gl6_mesh_vert, gl6_mesh_frag};
+  // Initialize resources
+  Shader program = {texture_vert_glsl, texture_frag_glsl};
 
-  Texture sphereTexture = {"sphere.bmp"};
-  Texture cursorTexture = {"lena.bmp"};
+  Texture sphereTexture = {image::loadBMP("sphere.bmp")};
+  Texture cursorTexture = {image::loadBMP("lena.bmp")};
 
-  Mesh sphere = {program, "sphere.obj"};
-  Mesh cursor = {program, "quad.obj"};
+  Mesh sphere = {"sphere.obj"};
+  Mesh cursor = {"quad.obj"};
+  Mesh cube = {"cube.obj"};
 
   bool animationEnabled = true;
-  double cursorX = 0.0f;
-  double cursorY = 0.0f;
+  double cursorX = 0.0;
+  double cursorY = 0.0;
 
+  float time = 0.0f;
 public:
-  // Initialize our window
+  /*!
+   * Construct our new custom window and set up OpenGL
+   */
   MeshWindow() : Window{"gl6_mesh", SIZE, SIZE} {
-    HideCursor();
+    hideCursor();
 
     // Enable Z-buffer
     glEnable(GL_DEPTH_TEST);
@@ -46,22 +53,36 @@ public:
     glCullFace(GL_BACK);
   }
 
-  // Handle key 'A' to pause the animation
+  /*!
+   * Handles pressed key when the window is focused
+   * @param key Key code of the key being pressed/released
+   * @param scanCode Scan code of the key being pressed/released
+   * @param action Action indicating the key state change
+   * @param mods Additional modifiers to consider
+   */
   void onKey(int key, int scanCode, int action, int mods) override {
-    if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
       animationEnabled = !animationEnabled;
     }
   }
 
-  // Update cursor position (screen coordinates <0, SIZE> to OpenGL viewport coordinates <-1,1>)
+  /*!
+   * Handle cursor position changes
+   * @param cursorX Mouse horizontal position in window coordinates
+   * @param cursorY Mouse vertical position in window coordinates
+   */
   void onCursorPos(double cursorX, double cursorY) override {
+    // Convert position from screen coordinates <0, SIZE> to OpenGL viewport coordinates <-1,1>
     this->cursorX = (cursorX / ((double) SIZE) * 2) - 1;
     this->cursorY = -((cursorY / ((double) SIZE) * 2) - 1);
   }
 
-  // Display the scene
+  /*!
+   * Window update implementation that will be called automatically from pollEvents
+   */
   void onIdle() override {
-    float time = 0;
+    // Animate using time when activated
+    if (animationEnabled) time = (float) glfwGetTime();
 
     // Set gray background
     glClearColor(.5f, .5f, .5f, 0);
@@ -69,53 +90,48 @@ public:
     // Clear depth and color buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Animate using time when activated
-    if (animationEnabled)
-      time = (float) glfwGetTime();
-
     // Create object matrices
-    auto centerSphereMat = rotate(mat4{}, time, {0.5f, 1.0f, 0.0f});
-    auto smallSphereMat = translate(mat4{}, {sin(time), cos(time), 0});
-    smallSphereMat = scale(smallSphereMat, {0.5f, 0.5f, 0.5f});
+    auto cubeMat = rotate(mat4{}, time, {0.5f, 1.0f, 0.0f});
+    auto sphereMat = translate(mat4{}, {sin(time), cos(time), 0});
+    sphereMat = scale(sphereMat, {0.5f, 0.5f, 0.5f});
 
     // Camera position/rotation - for example, translate camera a bit backwards (positive value in Z axis), so we can see the objects
     auto cameraMat = translate(mat4{}, {0.0f, 0.0f, -2.5f});
-    program.SetMatrix(cameraMat, "ViewMatrix");
+    program.setUniform("ViewMatrix", cameraMat);
 
     // Update camera position with perspective projection
-    program.SetMatrix(perspective((PI / 180.f) * 60.0f, 1.0f, 0.1f, 10.0f), "ProjectionMatrix");
+    program.setUniform("ProjectionMatrix", perspective((PI / 180.f) * 60.0f, 1.0f, 0.1f, 10.0f));
 
     // Render objects
-    program.SetTexture(sphereTexture, "Texture");
+    program.setUniform("Texture", sphereTexture);
 
-    // Central sphere
-    program.SetMatrix(centerSphereMat, "ModelMatrix");
-    sphere.Render();
+    // Central box
+    program.setUniform("ModelMatrix", cubeMat);
+    cube.render();
 
     // Smaller sphere
-    program.SetMatrix(smallSphereMat, "ModelMatrix");
-    sphere.Render();
+    program.setUniform("ModelMatrix", sphereMat);
+    sphere.render();
 
     // Draw cursor using orthographic/parallel projection
-    program.SetMatrix(ortho(-1.0f, 1.0f, -1.0f, 1.0f, 1000.0f, -1000.0f), "ProjectionMatrix");
+    program.setUniform("ProjectionMatrix", ortho(-1.0f, 1.0f, -1.0f, 1.0f, 1000.0f, -1000.0f));
 
     // Create object matrix
-    auto cursorMat = translate(mat4{}, {cursorX, cursorY, 0.0f});
-    cursorMat = scale(cursorMat, {0.1f, 0.1f, 0.1f});
+    auto cursorMat =  translate(mat4{}, {cursorX, cursorY, 0.0f}) * scale(mat4{}, {0.1f, 0.1f, 0.1f});
 
     // Render objects
-    program.SetTexture(cursorTexture, "Texture");
-    program.SetMatrix(cursorMat, "ModelMatrix");
-    cursor.Render();
+    program.setUniform("Texture", cursorTexture);
+    program.setUniform("ModelMatrix", cursorMat);
+    cursor.render();
   }
 };
 
 int main() {
   // Create instance of our mesh window
-  auto window = MeshWindow{};
+  MeshWindow window;
 
-  // Pool events in loop
-  while (window.Pool()) {}
+  // Poll events in loop
+  while (window.pollEvents()) {}
 
   return EXIT_SUCCESS;
 }

@@ -8,20 +8,37 @@
 #include "object.h"
 #include "camera.h"
 
-// Simple object that contains all scene related data
-// Object pointers are stored in a list of objects
-// Keyboard and Mouse states are stored in a map and struct
+/*
+ * Scene is an object that will aggregate all scene related data
+ * Objects are stored in a list of objects
+ * Keyboard and Mouse states are stored in a map and struct
+ */
 class Scene {
   public:
-    // Animate all objects in scene
-    void Update(float time);
-    // Render all objects in scene
-    void Render();
+    /*!
+     * Update all objects in the scene
+     * @param time
+     */
+    void update(float time);
 
-    std::shared_ptr<Camera> camera;
-    std::list< std::shared_ptr<Object> > objects;
+    /*!
+     * Render all objects in the scene
+     */
+    void render();
+
+    // Camera object
+    std::unique_ptr<Camera> camera;
+
+    // All objects to be rendered in scene
+    std::list< std::unique_ptr<Object> > objects;
+
+    // Keyboard state
     std::map< int, int > keyboard;
 
+    // Lights, in this case using only simple directional diffuse lighting
+    glm::vec3 lightDirection{-1.0f, -1.0f, -1.0f};
+
+    // Store cursor state
     struct {
       double x, y;
       bool left, right;

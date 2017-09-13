@@ -8,10 +8,9 @@
 using namespace std;
 using namespace glm;
 
-void Object::GenerateModelMatrix() {
+void Object::generateModelMatrix() {
   modelMatrix =
           glm::translate(mat4(1.0f), position)
           * glm::orientate4(rotation)
           * glm::scale(mat4(1.0f), scale);
 }
-

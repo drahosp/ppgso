@@ -1,5 +1,5 @@
 .*
-_build*
-_install*
-result.raw
-cmake-build-debug
+_*
+src/playground/playground.cpp
+data/raw*
+data/task*

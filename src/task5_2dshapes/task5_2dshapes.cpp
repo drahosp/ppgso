@@ -1,5 +1,6 @@
 // Task 5 - Draw a 2D shape using polygons and animate it
 //        - Encapsulate the shape using a class
+//        - Use color_vert/frag shader to display the polygon
 //        - Animate the object position, rotation and scale.
 
 #include <iostream>
@@ -7,10 +8,11 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtx/matrix_transform_2d.hpp>
+#include <glm/gtx/euler_angles.hpp>
 #include <ppgso/ppgso.h>
 
-#include "task5_2dshapes_vert.h"
-#include "task5_2dshapes_frag.h"
+#include <shaders/color_vert_glsl.h>
+#include <shaders/color_frag_glsl.h>
 
 using namespace std;
 using namespace glm;
@@ -22,34 +24,39 @@ const unsigned int SIZE = 512;
 class Shape {
 private:
   // 2D vectors define points/vertices of the shape
-  vector<vec2> vetrices = {
-      {-.3, 1},
-      {.3,  1},
-      {1, 0},
-      {.3, -1},
-      {-.3, -1},
-      {-1, 0},
+  vector<vec3> vetrices = {
+      {-.3,  1, 0},
+      { .3,  1, 0},
+      {  1,  0, 0},
+      { .3, -1, 0},
+      {-.3, -1, 0},
+      { -1,  0, 0},
+  };
+
+  // Structure representing a triangular face
+  struct Face {
+    GLuint v0, v1, v2;
   };
 
   // Indices define triangles that index into vertices
-  vector<GLuint> indices = {
-      0, 1, 2,
-      0, 2, 3,
-      0, 3, 4,
-      0, 4, 5,
+  vector<Face> indices = {
+      {0, 1, 2},
+      {0, 2, 3},
+      {0, 3, 4},
+      {0, 4, 5},
   };
 
   // Program to associate with the object
-  Shader program = {task5_2dshapes_vert, task5_2dshapes_frag};
+  Shader program = {color_vert_glsl, color_frag_glsl};
 
   // These will hold the data and object buffers
-  GLuint vao, vbo, ibo;
-  mat3 model_matrix;
+  GLuint vao, vbo, cbo, ibo;
+  mat4 modelMatrix;
 public:
   // Public attributes that define position, color ..
-  vec2 position{0,0};
-  float rotation{0};
-  vec2 scale{1,1};
+  vec3 position{0,0,0};
+  vec3 rotation{0,0,0};
+  vec3 scale{1,1,1};
   vec3 color{1,0,0};
 
   // Initialize object data buffers
@@ -61,44 +68,50 @@ public:
     // Copy positions to gpu
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vetrices.size() * sizeof(vec2), vetrices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vetrices.size() * sizeof(vec3), vetrices.data(), GL_STATIC_DRAW);
 
     // Set vertex program inputs
-    auto position_attrib = program.GetAttribLocation("pos");
+    auto position_attrib = program.getAttribLocation("Position");
     glEnableVertexAttribArray(position_attrib);
-    glVertexAttribPointer(position_attrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(position_attrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     // Copy indices to gpu
     glGenBuffers(1, &ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(Face), indices.data(), GL_STATIC_DRAW);
 
+    // Set projection matrices to identity
+    program.setUniform("ProjectionMatrix", mat4{});
+    program.setUniform("ViewMatrix", mat4{});
   };
   // Clean up
   ~Shape() {
     // Delete data from OpenGL
     glDeleteBuffers(1, &ibo);
+    glDeleteBuffers(1, &cbo);
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
   }
 
   // Set the object transformation matrix
-  void Update() {
+  void update() {
     // Compute transformation by scaling, rotating and then translating the shape
-    model_matrix = glm::translate(mat3{}, position)
-                 * glm::rotate(mat3{}, rotation)
-                 * glm::scale(mat3{}, scale);
+    modelMatrix = glm::translate(mat4{}, position)
+                * glm::rotate(mat4{}, rotation.x, {1,0,0})
+                * glm::rotate(mat4{}, rotation.y, {0,1,0})
+                * glm::rotate(mat4{}, rotation.z, {0,0,1})
+                * glm::scale(mat4{}, scale);
   }
 
   // Draw polygons
-  void Render(){
+  void render(){
     // Update transformation and color uniforms in the shader
-    program.Use();
-    program.SetMatrix(model_matrix, "mat");
-    program.SetVector(color, "color");
+    program.use();
+    program.setUniform("OverallColor", color);
+    program.setUniform("ModelMatrix", modelMatrix);
 
     glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, (GLsizei) indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, (GLsizei) indices.size() * 3, GL_UNSIGNED_INT, 0);
   };
 };
 
@@ -121,21 +134,21 @@ public:
     float t = (float) glfwGetTime();
 
     // Set position to follow direction
-    shape1.position = {sin(t), cos(t)};
+    shape1.position = {sin(t), cos(t), 0};
     shape2.position = -shape1.position;
 
     // Set rotation and scale
-    shape1.rotation = t*5.0f;
+    shape1.rotation.z = t*5.0f;
     shape2.rotation = -shape1.rotation;
 
-    shape1.scale = {sin(t),sin(t)};
+    shape1.scale = {sin(t),sin(t), 1};
     shape2.scale = -shape1.scale;
 
-    shape1.Update();
-    shape2.Update();
+    shape1.update();
+    shape2.update();
 
-    shape1.Render();
-    shape2.Render();
+    shape1.render();
+    shape2.render();
   }
 };
 
@@ -144,7 +157,7 @@ int main() {
   auto window = ShapeWindow{};
 
   // Main execution loop
-  while (window.Pool()) {}
+  while (window.pollEvents()) {}
 
   return EXIT_SUCCESS;
 }

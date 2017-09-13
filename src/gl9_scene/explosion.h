@@ -1,27 +1,40 @@
-#ifndef PPGSO_EXPLOSION_H
-#define PPGSO_EXPLOSION_H
-
+#pragma once
 #include <ppgso/ppgso.h>
 
 #include "object.h"
 
-class Explosion : public Object {
+/*!
+ * Simple explosion object that will render expanding transparent geometry in the scene with additive blending
+ */
+class Explosion final : public Object {
 private:
-  static std::shared_ptr<ppgso::Shader> shader;
-  static std::shared_ptr<ppgso::Mesh> mesh;
-  static std::shared_ptr<ppgso::Texture> texture;
+  static std::unique_ptr<ppgso::Shader> shader;
+  static std::unique_ptr<ppgso::Mesh> mesh;
+  static std::unique_ptr<ppgso::Texture> texture;
 
-  float age = 0;
-  float maxAge = 0.2f;
+  float age{0.0f};
+  float maxAge{0.2f};
   glm::vec3 rotMomentum;
 public:
   glm::vec3 speed;
 
+  /*!
+   * Create new Explosion
+   */
   Explosion();
-  ~Explosion();
 
-  bool Update(Scene &scene, float dt) override;
-  void Render(Scene &scene) override;
+  /*!
+   * Update explosion
+   * @param scene Scene to update
+   * @param dt Time delta
+   * @return true to delete the object
+   */
+  bool update(Scene &scene, float dt) override;
+
+  /*!
+   * Render explosion
+   * @param scene Scene to render in
+   */
+  void render(Scene &scene) override;
 };
 
-#endif //PPGSO_EXPLOSION_H
