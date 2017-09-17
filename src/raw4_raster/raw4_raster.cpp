@@ -100,7 +100,7 @@ private:
     auto x = (int) (textCoord.x * (image.width - 1));
     auto y = (int) (textCoord.y * (image.height - 1));
     // NOTE: The coordinates are vertically inverted for compatibility with object files generated using Blender 3D.
-    auto pixel = image.getPixel(x, image.height-y);
+    auto pixel = image.getPixel(x, image.height-y-1);
     // Return normalized color vector
     return vec4{pixel.r / 255.0f, pixel.g / 255.0f, pixel.b / 255.0f, 1.0};
   }
