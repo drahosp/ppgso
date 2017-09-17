@@ -132,7 +132,7 @@ The included OpenGL 3.3 examples will generate graphical output directly onto th
 The recommended way to build and explore the examples is to use the [CLion IDE](https://www.jetbrains.com/clion/) which is available for macOS, Linux and Windows. It is free for 30days and you can register for a [FREE LICENSE](https://www.jetbrains.com/student/) using university mail.
 
 Depending on your system of choice you will need to install the following dependencies:
-* C++17 capable compiler
+* C++14 capable compiler
 * [CMake](https://cmake.org) build system - This is part of the CLion IDE installation
 * [GLEW](http://glew.sourceforge.net) - The OpenGL Extension Wrangler Library for compatibility reasons
 * [GLFW3](http://www.glfw.org) - Platform-independent API for creating windows, reading input, handling events, etc.
