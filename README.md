@@ -162,7 +162,8 @@ On Microsoft Windows you may try to open the `CMakeLists.txt` file with the late
 However the recommended way is to avoid Visual Studio and install [CLion IDE](https://www.jetbrains.com/clion/) and a __GCC__ based compiler:
 
 * Download and install [MinGW-w64](https://sourceforge.net/projects/mingw-w64/), this is the latest GCC compiler for Windows in a nice installer.
-* Make sure to install the 64bit version into C:/mingw-w64 instead of Program Files.
+* Make sure to install the __64bit version__, you need to manually switch this in the installer process. 
+* To avoid issues with malformed paths also edit the installation destination to C:/mingw-w64 instead of Program Files.
 * Run CLion and select MinGW as the __toolchain__ when prompted (default is C:/mingw-w64/..)
 * Setup the rest of the settings as you see fit.
 * Open this directory and point the IDE towards the `CMakeLists.txt` file.
