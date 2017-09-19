@@ -52,7 +52,7 @@ struct Hit {
 /*!
  * Constant for collisions that have not hit any object in the scene
  */
-constexpr Hit noHit{ INF, {0,0,0}, {0,0,0}, { {0,0,0}, {0,0,0}, 0, 0, 0 } };
+const Hit noHit{ INF, {0,0,0}, {0,0,0}, { {0,0,0}, {0,0,0}, 0, 0, 0 } };
 
 /*!
  * Structure representing a simple camera that is composed on position, up, back and right vectors
@@ -226,7 +226,7 @@ struct World {
         dvec3 color;
 
         // Generate multiple samples
-        for (int i = 0; i < samples; ++i) {
+        for (unsigned int i = 0; i < samples; ++i) {
           auto ray = camera.generateRay(x, y, image.width, image.height);
           color = color + trace(ray, depth);
         }

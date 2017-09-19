@@ -101,7 +101,7 @@ void Window::glfw_mouse_button_callback(GLFWwindow *window, int button, int acti
 }
 
 void Window::close() {
-  glfwSetWindowShouldClose(window, GLFW_TRUE);
+  glfwSetWindowShouldClose(window, true);
 }
 
 void Window::glfw_window_refresh_callback(GLFWwindow *window) {
