@@ -106,6 +106,7 @@ void Window::close() {
 
 void Window::glfw_window_refresh_callback(GLFWwindow *window) {
   windows[window]->onRefresh();
+  glfwSwapBuffers(window);
 }
 
 void Window::resize(unsigned int width, unsigned int height) {
