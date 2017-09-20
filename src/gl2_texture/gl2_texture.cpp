@@ -90,9 +90,9 @@ public:
   }
 
   /*!
-   * Window refresh implementation that will be called automatically from pollEvents when needed
+   * Window update implementation that will be called automatically from pollEvents
    */
-  void onRefresh() override {
+  void onIdle() override {
     // Set gray background
     glClearColor(.5f, .5f, .5f, 0);
 
