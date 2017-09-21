@@ -181,6 +181,11 @@ add_executable(playground src/playground/playground.cpp)
 target_link_libraries(playground ppgso shaders)
 install (TARGETS playground DESTINATION .)
 
+# Task1
+add_executable(task1_filter src/task1_filter/task1_filter.cpp)
+target_link_libraries(task1_filter)
+install (TARGETS task1_filter DESTINATION .)
+
 #
 # INSTALLATION
 #
