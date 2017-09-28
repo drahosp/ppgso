@@ -183,8 +183,13 @@ install (TARGETS playground DESTINATION .)
 
 # Task1
 add_executable(task1_filter src/task1_filter/task1_filter.cpp)
-target_link_libraries(task1_filter)
+target_link_libraries(task1_filter ppgso)
 install (TARGETS task1_filter DESTINATION .)
+
+# Task2
+add_executable(task2_convolution src/task2_convolution/task2_convolution.cpp)
+target_link_libraries(task2_convolution ppgso)
+install (TARGETS task2_convolution DESTINATION .)
 
 #
 # INSTALLATION
