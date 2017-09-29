@@ -194,5 +194,5 @@ install (TARGETS task2_convolution DESTINATION .)
 #
 # INSTALLATION
 #
-
+file(COPY "data/" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 install(DIRECTORY data/ DESTINATION .)
