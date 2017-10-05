@@ -191,6 +191,11 @@ add_executable(task2_convolution src/task2_convolution/task2_convolution.cpp)
 target_link_libraries(task2_convolution ppgso)
 install (TARGETS task2_convolution DESTINATION .)
 
+# Task3
+add_executable(task3_bresenham src/task3_bresenham/task3_bresenham.cpp)
+target_link_libraries(task3_bresenham ppgso)
+install (TARGETS task3_bresenham DESTINATION .)
+
 #
 # INSTALLATION
 #
