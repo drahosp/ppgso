@@ -1,6 +1,6 @@
 // Task 3 - Implement Bresenham drawing alg.
 //        - Draw a star using lines
-//        - save as result.raw
+//        - Make use of std::vector to define the shape
 #include <fstream>
 #include <iostream>
 #include <vector>
