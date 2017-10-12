@@ -196,6 +196,11 @@ add_executable(task3_bresenham src/task3_bresenham/task3_bresenham.cpp)
 target_link_libraries(task3_bresenham ppgso)
 install (TARGETS task3_bresenham DESTINATION .)
 
+# Task4
+add_executable(task4_bezier src/task4_bezier/task4_bezier.cpp)
+target_link_libraries(task4_bezier ppgso shaders)
+install (TARGETS task4_bezier DESTINATION .)
+
 #
 # INSTALLATION
 #
