@@ -206,6 +206,11 @@ add_executable(task5_2dshapes src/task5_2dshapes/task5_2dshapes.cpp)
 target_link_libraries(task5_2dshapes ppgso shaders)
 install (TARGETS task5_2dshapes DESTINATION .)
 
+# Task6
+add_executable(task6_bezier_surface src/task6_bezier_surface/task6_bezier_surface.cpp)
+target_link_libraries(task6_bezier_surface ppgso shaders)
+install (TARGETS task6_bezier_surface DESTINATION .)
+
 #
 # INSTALLATION
 #
