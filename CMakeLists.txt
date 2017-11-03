@@ -211,6 +211,11 @@ add_executable(task6_bezier_surface src/task6_bezier_surface/task6_bezier_surfac
 target_link_libraries(task6_bezier_surface ppgso shaders)
 install (TARGETS task6_bezier_surface DESTINATION .)
 
+# Task7
+add_executable(task7_particles src/task7_particles/task7_particles.cpp)
+target_link_libraries(task7_particles ppgso shaders)
+install (TARGETS task7_particles DESTINATION .)
+
 #
 # INSTALLATION
 #
