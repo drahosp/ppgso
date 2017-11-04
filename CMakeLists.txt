@@ -219,5 +219,5 @@ install (TARGETS task7_particles DESTINATION .)
 #
 # INSTALLATION
 #
-
+file(COPY "data/" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 install(DIRECTORY data/ DESTINATION .)
