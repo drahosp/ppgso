@@ -31,5 +31,13 @@ public:
    * Update Camera viewMatrix based on up, position and back vectors
    */
   void update();
+
+  /*!
+   * Get direction vector in world coordinates through camera projection plane
+   * @param u - camera projection plane horizontal coordinate [-1,1]
+   * @param v - camera projection plane vertical coordinate [-1,1]
+   * @return Normalized vector from camera position to position on the camera projection plane
+   */
+  glm::vec3 cast(float u, float v);
 };
 

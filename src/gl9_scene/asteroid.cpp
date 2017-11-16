@@ -115,3 +115,9 @@ void Asteroid::render(Scene &scene) {
   mesh->render();
 }
 
+void Asteroid::onClick(Scene &scene) {
+  cout << "Asteroid clicked!" << endl;
+  explode(scene, position, {10.0f, 10.0f, 10.0f}, 0 );
+  age = 10000;
+}
+

@@ -94,3 +94,7 @@ void Player::render(Scene &scene) {
   shader->setUniform("Texture", *texture);
   mesh->render();
 }
+
+void Player::onClick(Scene &scene) {
+  cout << "Player has been clicked!" << endl;
+}

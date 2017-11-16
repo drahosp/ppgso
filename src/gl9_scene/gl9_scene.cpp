@@ -63,7 +63,7 @@ public:
    * Construct custom game window
    */
   SceneWindow() : Window{"gl9_scene", SIZE, SIZE} {
-    hideCursor();
+    //hideCursor();
     glfwSetInputMode(window, GLFW_STICKY_KEYS, 1);
 
     // Initialize OpenGL state
@@ -119,6 +119,25 @@ public:
   void onMouseButton(int button, int action, int mods) override {
     if(button == GLFW_MOUSE_BUTTON_LEFT) {
       scene.cursor.left = action == GLFW_PRESS;
+
+      if (scene.cursor.left) {
+        // Convert pixel coordinates to Screen coordinates
+        float u = (scene.cursor.x / width - 0.5f) * 2.0f;
+        float v = - (scene.cursor.y / height - 0.5f) * 2.0f;
+
+        // Get mouse pick vector in world coordinates
+        auto direction = scene.camera->cast(u, v);
+        auto position = scene.camera->position;
+
+        // Get all objects in scene intersected by ray
+        auto picked = scene.intersect(position, direction);
+
+        // Go through all objects that have been picked
+        for (auto &obj: picked) {
+          // Pass on the click event
+          obj->onClick(scene);
+        }
+      }
     }
     if(button == GLFW_MOUSE_BUTTON_RIGHT) {
       scene.cursor.right = action == GLFW_PRESS;
