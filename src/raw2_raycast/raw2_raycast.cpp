@@ -212,9 +212,7 @@ struct World {
     }
 
     // Additive lighting result
-    dvec3 color = ambientColor + emissionColor + diffuseColor + specularColor;
-
-    return clamp(color, 0.0, 1.0);
+    return ambientColor + emissionColor + diffuseColor + specularColor;
   }
 
   /*!
@@ -225,7 +223,7 @@ struct World {
     // Render section of the framebuffer
     for(int y = 0; y < image.height; ++y) {
       for (int x = 0; x < image.width; ++x) {
-        dvec3 color;
+        dvec3 color{};
         for (unsigned int i = 0; i < samples; i++) {
           auto ray = camera.generateRay(x, y, image.width, image.height);
           color = color + trace(ray);

@@ -107,14 +107,14 @@ private:
         });
 
       case Mode::ROTATE_TOP_LEFT:
-        return translate(mat4{}, vec3{-1, 1, 0})
-               * rotate(mat4{}, time, vec3{0, 0, 1})
-               * glm::translate(mat4{}, -vec3{-1, 1, 0});
+        return translate(mat4{1.0f}, vec3{-1, 1, 0})
+               * rotate(mat4{1.0f}, time, vec3{0, 0, 1})
+               * glm::translate(mat4{1.0f}, -vec3{-1, 1, 0});
 
       default:
         break;
     }
-    return mat4{};
+    return mat4{1.0f};
   }
 
 public:
@@ -125,8 +125,8 @@ public:
     // Set program input for texture uniform
     program.setUniform("Texture", texture);
     // Set Matrices to identity so there are no projections/transformations applied in the vertex shader
-    program.setUniform("ViewMatrix", mat4{});
-    program.setUniform("ProjectionMatrix", mat4{});
+    program.setUniform("ViewMatrix", mat4{1.0f});
+    program.setUniform("ProjectionMatrix", mat4{1.0f});
   }
 
   /*!

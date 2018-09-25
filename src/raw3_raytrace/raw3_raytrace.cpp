@@ -223,7 +223,7 @@ struct World {
     #pragma omp parallel for
     for (int y = 0; y < image.height; ++y) {
       for (int x = 0; x < image.width; ++x) {
-        dvec3 color;
+        dvec3 color{};
 
         // Generate multiple samples
         for (unsigned int i = 0; i < samples; ++i) {
@@ -231,7 +231,7 @@ struct World {
           color = color + trace(ray, depth);
         }
         // Collect the data
-        color = clamp(color / (double) samples, 0.0, 1.0);
+        color = color / (double) samples;
         image.setPixel(x, y, (float)color.r, (float)color.g, (float)color.b);
       }
     }
@@ -266,7 +266,7 @@ int main() {
   };
 
   // Render the scene
-  world.render(image, 64, 5);
+  world.render(image, 32, 5);
 
   // Save the result
   image::saveBMP(image, "raw3_raytrace.bmp");

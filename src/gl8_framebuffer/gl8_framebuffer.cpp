@@ -100,10 +100,10 @@ public:
     auto sphereProjectionMatrix = perspective((PI / 180.f) * 60.0f, (float)SIZE/(float)SIZE, 1.0f, 10.0f);
 
     // Create view matrix (translate camera backwards a bit, so we can see the geometry)
-    auto sphereViewMatrix = translate(mat4(), {0.0f, 0.0f, -1.5f});
+    auto sphereViewMatrix = translate(mat4{1.0}, {0.0f, 0.0f, -1.5f});
 
     // Assign sphere texture
-    auto sphereModelMatrix = rotate(mat4{}, time, {0, 1, 0});
+    auto sphereModelMatrix = rotate(mat4{1.0f}, time, {0, 1, 0});
 
     // Set shader inputs
     sphereShader.use();
@@ -128,10 +128,10 @@ public:
     auto quadProjectionMatrix = perspective((PI / 180.f) * 60.0f, (float)SIZE/(float)SIZE, 1.0f, 10.0f);
 
     // Create view matrix (translate camera backwards a bit, so we can see the geometry)
-    auto quadViewMatrix = translate(mat4(), {0.0f, 0.0f, -3.0f});
+    auto quadViewMatrix = translate(mat4{1.0f}, {0.0f, 0.0f, -3.0f});
 
     // Animate rotation of the quad
-    auto quadModelMatrix = rotate(mat4{}, sin(time / 2.0f) * 1.5f, {0, 1, .1});
+    auto quadModelMatrix = rotate(mat4{1.0f}, sin(time / 2.0f) * 1.5f, {0, 1, .1});
 
     // Set shader inputs
     quadShader.use();

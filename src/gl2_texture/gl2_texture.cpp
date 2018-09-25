@@ -77,9 +77,9 @@ public:
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
     // Set Matrices to identity so there are no projections/transformations applied in the vertex shader
-    program.setUniform("ModelMatrix", mat4{});
-    program.setUniform("ViewMatrix", mat4{});
-    program.setUniform("ProjectionMatrix", mat4{});
+    program.setUniform("ModelMatrix", mat4{1.0f});
+    program.setUniform("ViewMatrix", mat4{1.0f});
+    program.setUniform("ProjectionMatrix", mat4{1.0f});
   }
 
   /*!
@@ -90,9 +90,9 @@ public:
   }
 
   /*!
-   * Window update implementation that will be called automatically from pollEvents
+   * Window refresh implementation that will be called automatically from pollEvents when needed
    */
-  void onIdle() override {
+  void onRefresh() override {
     // Set gray background
     glClearColor(.5f, .5f, .5f, 0);
 

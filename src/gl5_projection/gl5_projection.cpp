@@ -51,7 +51,7 @@ private:
         program.setUniform("ProjectionMatrix", perspective((PI / 180.f) * 60.0f, 1.0f, 0.1f, 10.0f));
 
         // Create view matrix (translate camera a bit backwards, so we can see the geometry)
-        program.setUniform("ViewMatrix", translate(mat4{}, {0.0f, 0.0f, -3.0f}));
+        program.setUniform("ViewMatrix", translate(mat4{1.0f}, {0.0f, 0.0f, -3.0f}));
         break;
       case Mode::PARALLEL:
         // Create projection matrix (field of view (radians), aspect ratio, near plane distance, far plane distance)
@@ -87,8 +87,8 @@ public:
 
     // Quad positions
     // Coordinates in world coordinates
-    quad1ModelMatrix = translate(mat4{}, {0, 0, 1});
-    quad2ModelMatrix = translate(mat4{}, {0, 0, -1});
+    quad1ModelMatrix = translate(mat4{1.0f}, {0, 0, 1});
+    quad2ModelMatrix = translate(mat4{1.0f}, {0, 0, -1});
   }
 
   /*!
@@ -112,7 +112,7 @@ public:
   void onIdle() override {
     // Update time and create a rotation matrix
     auto time = glfwGetTime();
-    auto rotateMat = rotate(mat4{}, (float)time, {0, 1, 0});
+    auto rotateMat = rotate(mat4{1.0f}, (float)time, {0, 1, 0});
 
     // Set up projection and view matrix
     setProjection();

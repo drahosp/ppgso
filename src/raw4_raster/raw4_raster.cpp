@@ -100,7 +100,7 @@ private:
     auto x = (int) (textCoord.x * (image.width - 1));
     auto y = (int) (textCoord.y * (image.height - 1));
     // NOTE: The coordinates are vertically inverted for compatibility with object files generated using Blender 3D.
-    auto pixel = image.getPixel(x, image.height-y-1);
+    auto pixel = image.getPixel(x, image.height-y);
     // Return normalized color vector
     return vec4{pixel.r / 255.0f, pixel.g / 255.0f, pixel.b / 255.0f, 1.0};
   }
@@ -122,7 +122,7 @@ private:
    */
   Vertex toViewport(const Vertex &vertex) {
     // Matrix that aligns the screen coordinates to viewport coordinates
-    static const mat4 viewportMatrix = glm::translate(glm::scale(mat4{}, vec3{image.width / 2.0, -image.height / 2.0, 1.0}), vec3{1, -1, 0});
+    static const mat4 viewportMatrix = glm::translate(glm::scale(mat4{1.0f}, vec3{image.width / 2.0, -image.height / 2.0, 1.0}), vec3{1, -1, 0});
     // First convert homogeneous coordinates to cartesian and transform to viewport
     vec4 viewportCoordinates = viewportMatrix * (vertex.position / vertex.position.w);
     // Copy rest of the data without change
