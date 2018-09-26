@@ -30,7 +30,7 @@ public:
    */
   DiffuseWindow() : Window{"gl7_diffuse", SIZE, SIZE} {
     // Set camera position/rotation - for example, translate camera a bit backwards (positive value in Z axis), so we can see the objects
-    auto cameraMat = translate(mat4{}, {0.0f, 0.0f, -1.0f});
+    auto cameraMat = translate(mat4{1.0f}, {0.0f, 0.0f, -1.0f});
     program.setUniform("ViewMatrix", cameraMat);
 
     // Set camera position with perspective projection
@@ -81,7 +81,7 @@ public:
     auto time = glfwGetTime();
 
     // Create object matrix that rotates in time
-    auto sphereMat = rotate(mat4{}, (float)time, {0.5f, 1.0f, 0.0f});
+    auto sphereMat = rotate(mat4{1.0f}, (float)time, {0.5f, 1.0f, 0.0f});
 
     // Set the matrix as model matrix for current program
     program.setUniform("ModelMatrix", sphereMat);

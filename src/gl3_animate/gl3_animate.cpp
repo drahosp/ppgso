@@ -68,9 +68,9 @@ public:
     program.setUniform("Texture", texture);
 
     // Set Matrices to identity so there are no projections/transformations applied in the vertex shader
-    program.setUniform("ModelMatrix", mat4{});
-    program.setUniform("ViewMatrix", mat4{});
-    program.setUniform("ProjectionMatrix", mat4{});
+    program.setUniform("ModelMatrix", mat4{1.0f});
+    program.setUniform("ViewMatrix", mat4{1.0f});
+    program.setUniform("ProjectionMatrix", mat4{1.0f});
   }
 
   /*!

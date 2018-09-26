@@ -91,12 +91,12 @@ public:
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Create object matrices
-    auto cubeMat = rotate(mat4{}, time, {0.5f, 1.0f, 0.0f});
-    auto sphereMat = translate(mat4{}, {sin(time), cos(time), 0});
+    auto cubeMat = rotate(mat4{1.0f}, time, {0.5f, 1.0f, 0.0f});
+    auto sphereMat = translate(mat4{1.0f}, {sin(time), cos(time), 0});
     sphereMat = scale(sphereMat, {0.5f, 0.5f, 0.5f});
 
     // Camera position/rotation - for example, translate camera a bit backwards (positive value in Z axis), so we can see the objects
-    auto cameraMat = translate(mat4{}, {0.0f, 0.0f, -2.5f});
+    auto cameraMat = translate(mat4{1.0f}, {0.0f, 0.0f, -2.5f});
     program.setUniform("ViewMatrix", cameraMat);
 
     // Update camera position with perspective projection
@@ -117,7 +117,7 @@ public:
     program.setUniform("ProjectionMatrix", ortho(-1.0f, 1.0f, -1.0f, 1.0f, 1000.0f, -1000.0f));
 
     // Create object matrix
-    auto cursorMat =  translate(mat4{}, {cursorX, cursorY, 0.0f}) * scale(mat4{}, {0.1f, 0.1f, 0.1f});
+    auto cursorMat =  translate(mat4{1.0f}, {cursorX, cursorY, 0.0f}) * scale(mat4{1.0f}, {0.1f, 0.1f, 0.1f});
 
     // Render objects
     program.setUniform("Texture", cursorTexture);

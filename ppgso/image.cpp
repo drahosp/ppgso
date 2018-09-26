@@ -1,7 +1,12 @@
+#include <algorithm>
 #include "image.h"
 
 using namespace std;
 using namespace ppgso;
+
+uint8_t clamp(float value) {
+  return (uint8_t) (std::min(std::max(value, 0.0f), 1.0f) * 255.0f);
+}
 
 Image::Image(int width, int height) : width{width}, height{height} {
   framebuffer.resize((size_t) (width * height));
@@ -28,5 +33,5 @@ void Image::setPixel(int x, int y, int r, int g, int b) {
 }
 
 void Image::setPixel(int x, int y, float r, float g, float b) {
-  setPixel(x,y,{(uint8_t) (r * 255), (uint8_t) (g * 255), (uint8_t) (b * 255)});
+  setPixel(x,y,{clamp(r), clamp(g), clamp(b)});
 }

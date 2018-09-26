@@ -35,8 +35,8 @@ void Space::render(Scene &scene) {
 
   // Render mesh, not using any projections, we just render in 2D
   shader->setUniform("ModelMatrix", modelMatrix);
-  shader->setUniform("ViewMatrix", mat4{});
-  shader->setUniform("ProjectionMatrix", mat4{});
+  shader->setUniform("ViewMatrix", mat4{1.0f});
+  shader->setUniform("ProjectionMatrix", mat4{1.0f});
   shader->setUniform("Texture", *texture);
   mesh->render();
 
